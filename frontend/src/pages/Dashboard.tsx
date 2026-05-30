@@ -11,6 +11,8 @@ import SpeciesPanel from "../components/inspector/SpeciesPanel";
 
 import { useSimulationSocket } from "../hooks/useSimulationSocket";
 
+import CameraControls from "../components/simulation/CameraControls";
+
 export default function Dashboard() {
   useSimulationSocket();
 
@@ -43,7 +45,10 @@ export default function Dashboard() {
                 <h2 className="text-xl font-semibold">Simulation World</h2>
                 <span className="text-sm text-slate-400">Realtime Ecosystem</span>
               </div>
-              <SimulationCanvas />
+              <div className="relative">
+                <CameraControls />
+                <SimulationCanvas />
+              </div>
             </div>
           </section>
 

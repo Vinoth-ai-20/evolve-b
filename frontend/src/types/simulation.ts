@@ -7,4 +7,6 @@ export interface SimulationState {
   environment: Environment;
   organisms: Organism[];
   simulation_speed: number;
+  world_width: number;
+  world_height: number;
 }
