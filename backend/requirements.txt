@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+numpy
+scipy
+pydantic
+pydantic-settings
+pytest
+httpx
+websockets
+orjson
