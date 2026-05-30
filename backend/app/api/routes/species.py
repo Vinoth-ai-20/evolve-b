@@ -7,9 +7,15 @@ from app.analytics.species_tracker import species_tracker
 class SpeciesInfo(BaseModel):
     species_id: str
     count: int
+
     avg_speed: float
     avg_size: float
     avg_metabolism: float
+
+    dominant_diet: str
+    color: str
+
+    dominant_traits: list[str]
 
 
 router = APIRouter()
@@ -20,10 +26,18 @@ async def get_species() -> list[SpeciesInfo]:
     """Get list of all current species with their statistics"""
     result = []
 
+    color_map = {
+        "Herbivore": "#4ade80",
+        "Carnivore": "#ef4444",
+        "Omnivore": "#a855f7",
+    }
+
     for index, (species_key, members) in enumerate(
         species_tracker.species_map.items(),
         start=1,
     ):
+        diet = species_tracker.dominant_diet(members)
+
         try:
             traits = species_key.replace("(", "").replace(")", "").split(",")
             avg_size = float(traits[0]) if len(traits) > 0 else 0.0
@@ -41,6 +55,9 @@ async def get_species() -> list[SpeciesInfo]:
                 avg_speed=avg_speed,
                 avg_size=avg_size,
                 avg_metabolism=avg_metabolism,
+                dominant_diet=diet,
+                color=color_map[diet],
+                dominant_traits=species_tracker.dominant_traits(members),
             )
         )
 

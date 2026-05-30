@@ -16,7 +16,14 @@ export default function SpeciesPanel() {
             "http://localhost:8000/api/species/"
           );
 
-        setSpecies(response.data);
+        setSpecies(
+  response.data
+    .sort(
+      (a, b) =>
+        b.count - a.count
+    )
+    .slice(0, 3)
+);
       } catch (error) {
         console.error(error);
       }

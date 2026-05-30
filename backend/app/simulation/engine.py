@@ -61,6 +61,10 @@ from app.ecology.predator_prey import (
     attempt_predation,
 )
 
+from app.analytics.collectors import (
+    collect_metrics,
+)
+
 
 class SimulationEngine:
 
@@ -228,6 +232,8 @@ class SimulationEngine:
             self.tick_count,
             average_fitness,
         )
+
+        collect_metrics(self.organisms)
 
     def pause(self):
 

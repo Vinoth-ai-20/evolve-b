@@ -4,4 +4,7 @@ export interface Species {
   avg_speed: number;
   avg_size: number;
   avg_metabolism: number;
+  dominant_diet: string;
+  color: string;
+  dominant_traits: string[];
 }

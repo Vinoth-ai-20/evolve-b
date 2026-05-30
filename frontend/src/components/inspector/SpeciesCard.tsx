@@ -8,49 +8,52 @@ export default function SpeciesCard({
   species,
 }: Props) {
   return (
-    <div
-      className="
-      rounded-xl
-      border
-      border-slate-700
-      bg-slate-900
-      p-4
-      shadow
-      "
-    >
-      <h3 className="text-lg font-bold text-cyan-400">
-        {species.species_id}
-      </h3>
+    <div className="mt-3 space-y-3">
 
-      <div className="mt-3 space-y-1 text-sm">
-        <p>
-          Population:
-          <span className="ml-2 font-semibold">
-            {species.count}
-          </span>
-        </p>
+      <div className="flex items-center gap-2">
 
-        <p>
-          Avg Speed:
-          <span className="ml-2">
-            {species.avg_speed.toFixed(2)}
-          </span>
-        </p>
+        <div
+          className="h-4 w-4 rounded-full"
+          style={{
+            backgroundColor:
+              species.color,
+          }}
+        />
 
-        <p>
-          Avg Size:
-          <span className="ml-2">
-            {species.avg_size.toFixed(2)}
-          </span>
-        </p>
+        <span className="font-medium">
+          {species.dominant_diet}
+        </span>
 
-        <p>
-          Avg Metabolism:
-          <span className="ml-2">
-            {species.avg_metabolism.toFixed(2)}
-          </span>
-        </p>
       </div>
+
+      <div>
+        Population:
+        <span className="ml-2 font-semibold">
+          {species.count}
+        </span>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+
+        {species.dominant_traits.map(
+          (trait) => (
+            <span
+              key={trait}
+              className="
+          rounded-full
+          bg-slate-800
+          px-2
+          py-1
+          text-xs
+          "
+            >
+              {trait}
+            </span>
+          )
+        )}
+
+      </div>
+
     </div>
   );
 }
