@@ -1,4 +1,3 @@
-import SimulationCanvas from "../components/simulation/SimulationCanvas";
 import SimulationControls from "../components/controls/SimulationControls";
 
 import StatsDashboard from "../components/analytics/StatsDashboard";
@@ -35,6 +34,8 @@ import EvolutionReport from "../components/analytics/EvolutionReport";
 import LineagePanel from "../components/analytics/LineagePanel";
 
 import { useSimulationSocket } from "../hooks/useSimulationSocket";
+
+import SimulationCanvas from "../components/simulation/SimulationCanvas";
 
 export default function Dashboard() {
 

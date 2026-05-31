@@ -902,7 +902,7 @@ export default function SimulationCanvas() {
     <canvas
       ref={canvasRef}
       className="
-      h-200
+      h-screen
       w-full
       rounded-xl
       border

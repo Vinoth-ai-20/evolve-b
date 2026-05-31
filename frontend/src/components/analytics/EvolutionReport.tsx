@@ -2,6 +2,11 @@ import { useEffect, useState } from "react";
 
 import axios from "axios";
 
+interface Milestone {
+  tick: number;
+  message: string;
+}
+
 interface Report {
 
   population_trend: string;
@@ -14,7 +19,7 @@ interface Report {
 
   findings: string[];
 
-  recent_milestones: string[];
+  recent_milestones: Milestone[];
 }
 
 export default function EvolutionReport() {
@@ -203,14 +208,22 @@ export default function EvolutionReport() {
               <div
                 key={index}
                 className="
-                rounded-lg
-                border
-                border-slate-800
-                bg-slate-900
-                p-3
-                "
+      rounded-lg
+      border
+      border-slate-800
+      bg-slate-900
+      p-3
+      "
               >
-                {milestone}
+
+                <div className="text-xs text-amber-400">
+                  Tick {milestone.tick}
+                </div>
+
+                <div className="mt-1">
+                  {milestone.message}
+                </div>
+
               </div>
 
             )

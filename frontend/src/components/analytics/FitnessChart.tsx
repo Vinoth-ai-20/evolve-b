@@ -67,7 +67,7 @@ export default function FitnessChart() {
   return (
     <div
       className="
-      h-75
+      h-[300px]
       w-full
       "
     >

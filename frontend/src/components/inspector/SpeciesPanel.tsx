@@ -58,7 +58,7 @@ export default function SpeciesPanel() {
       </h2>
 
       <div
-        className="max-h-175 overflow-y-auto space-y-3 pr-1"
+        className="max-h-[700] overflow-y-auto space-y-3 pr-1"
       >
         {Array.isArray(species) &&
           species.map((item) => (
