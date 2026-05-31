@@ -309,7 +309,7 @@ export default function SimulationControls() {
       </div>
     )}
 
-    <div className="mb-5 flex gap-2">
+    <div className="mb-5 grid grid-cols-2 gap-2">
 
       <button
         onClick={start}

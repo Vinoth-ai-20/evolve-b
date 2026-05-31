@@ -86,5 +86,21 @@ class SpeciesTracker:
 
         return traits
 
+    def average_energy(self, organisms):
+        return sum(o.energy for o in organisms) / max(1, len(organisms))
+
+    def average_age(self, organisms):
+        return sum(o.age for o in organisms) / max(1, len(organisms))
+
+    def max_generation(self, organisms):
+        return max(o.generation for o in organisms)
+
+    def population_share(
+        self,
+        organisms,
+        total_population,
+    ):
+        return (len(organisms) / max(1, total_population)) * 100
+
 
 species_tracker = SpeciesTracker()

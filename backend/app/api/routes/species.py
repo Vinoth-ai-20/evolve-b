@@ -17,6 +17,11 @@ class SpeciesInfo(BaseModel):
 
     dominant_traits: list[str]
 
+    avg_energy: float
+    avg_age: float
+    max_generation: int
+    population_share: float
+
 
 router = APIRouter()
 
@@ -38,6 +43,19 @@ async def get_species() -> list[SpeciesInfo]:
     ):
         diet = species_tracker.dominant_diet(members)
 
+        total_population = sum(len(v) for v in species_tracker.species_map.values())
+
+        avg_energy = species_tracker.average_energy(members)
+
+        avg_age = species_tracker.average_age(members)
+
+        max_generation = species_tracker.max_generation(members)
+
+        population_share = species_tracker.population_share(
+            members,
+            total_population,
+        )
+
         try:
             traits = species_key.replace("(", "").replace(")", "").split(",")
             avg_size = float(traits[0]) if len(traits) > 0 else 0.0
@@ -58,6 +76,10 @@ async def get_species() -> list[SpeciesInfo]:
                 dominant_diet=diet,
                 color=color_map[diet],
                 dominant_traits=species_tracker.dominant_traits(members),
+                avg_energy=avg_energy,
+                avg_age=avg_age,
+                max_generation=max_generation,
+                population_share=population_share,
             )
         )
 

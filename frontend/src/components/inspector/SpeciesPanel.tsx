@@ -17,13 +17,13 @@ export default function SpeciesPanel() {
           );
 
         setSpecies(
-  response.data
-    .sort(
-      (a, b) =>
-        b.count - a.count
-    )
-    .slice(0, 3)
-);
+          response.data
+            .sort(
+              (a, b) =>
+                b.count - a.count
+            )
+            .slice(0, 3)
+        );
       } catch (error) {
         console.error(error);
       }
@@ -57,7 +57,9 @@ export default function SpeciesPanel() {
         Species
       </h2>
 
-      <div className="space-y-3">
+      <div
+        className="max-h-175 overflow-y-auto space-y-3 pr-1"
+      >
         {Array.isArray(species) &&
           species.map((item) => (
             <SpeciesCard

@@ -1,45 +1,211 @@
+import { useMemo } from "react";
 import { useSimulationStore } from "../../store/simulationStore";
 
-export default function StatsDashboard() {
-  const state = useSimulationStore((s) => s.state);
+interface StatCardProps {
+  label: string;
+  value: string | number;
+  color: string;
+  subtitle?: string;
+}
 
-  const population = state?.population ?? 0;
-  const temperature = state?.environment.temperature ?? 0;
-  const humidity = state?.environment.humidity ?? 0;
-  const sunlight = state?.environment.sunlight ?? 0;
-  const speed = state?.simulation_speed ?? 1.0;
+function StatCard({
+  label,
+  value,
+  color,
+  subtitle,
+}: StatCardProps) {
+  return (
+    <div
+      className="
+      rounded-2xl
+      border
+      border-slate-800
+      bg-slate-900/80
+      p-5
+      backdrop-blur
+      transition-all
+      hover:border-slate-700
+      hover:bg-slate-900
+      "
+    >
+      <div className="text-xs uppercase tracking-wider text-slate-500">
+        {label}
+      </div>
+
+      <div
+        className={`mt-3 text-3xl font-bold ${color}`}
+      >
+        {value}
+      </div>
+
+      {subtitle && (
+        <div className="mt-2 text-xs text-slate-500">
+          {subtitle}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function StatsDashboard() {
+  const state =
+    useSimulationStore(
+      (s) => s.state
+    );
+
+  const population =
+    state?.population ?? 0;
+
+  const speed =
+    state?.simulation_speed ?? 1;
+
+  const temperature =
+    state?.environment.temperature ?? 0;
+
+  const humidity =
+    state?.environment.humidity ?? 0;
+
+  const sunlight =
+    state?.environment.sunlight ?? 0;
+
+  const trophic =
+    state?.trophic_levels;
+
+  const speciesCount =
+    state?.species_count ?? 0;
+
+  const healthScore =
+    useMemo(() => {
+
+      const populationFactor =
+        Math.min(
+          population / 1000,
+          1
+        );
+
+      const speciesFactor =
+        Math.min(
+          speciesCount / 20,
+          1
+        );
+
+      let trophicFactor =
+        0.5;
+
+      if (trophic) {
+
+        const total =
+          trophic.herbivore +
+          trophic.carnivore +
+          trophic.omnivore;
+
+        if (total > 0) {
+
+          const herbivoreRatio =
+            trophic.herbivore /
+            total;
+
+          trophicFactor =
+            1 -
+            Math.abs(
+              herbivoreRatio -
+              0.6
+            );
+        }
+      }
+
+      const score =
+        (
+          (
+            populationFactor +
+            speciesFactor +
+            trophicFactor
+          ) /
+          3
+        ) * 100;
+
+      return Math.round(score);
+
+    }, [
+      population,
+      speciesCount,
+      trophic,
+    ]);
 
   return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-      {/* Population */}
-      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
-        <div className="text-sm font-medium text-slate-400">Population</div>
-        <div className="mt-2 text-2xl font-bold text-emerald-400">{population}</div>
-      </div>
+    <div
+      className="
+      grid
+      grid-cols-2
+      gap-4
+      md:grid-cols-4
+      xl:grid-cols-8
+      "
+    >
+      <StatCard
+        label="Population"
+        value={population.toLocaleString()}
+        color="text-emerald-400"
+        subtitle="Active Organisms"
+      />
 
-      {/* Temperature */}
-      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
-        <div className="text-sm font-medium text-slate-400">Temperature</div>
-        <div className="mt-2 text-2xl font-bold text-red-400">{temperature.toFixed(1)}°C</div>
-      </div>
+      <StatCard
+        label="Species"
+        value={speciesCount}
+        color="text-cyan-400"
+        subtitle="Detected Clusters"
+      />
 
-      {/* Humidity */}
-      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
-        <div className="text-sm font-medium text-slate-400">Humidity</div>
-        <div className="mt-2 text-2xl font-bold text-blue-400">{humidity.toFixed(1)}%</div>
-      </div>
+      <StatCard
+        label="Health Score"
+        value={`${healthScore}%`}
+        color="text-green-400"
+        subtitle="Ecosystem Stability"
+      />
 
-      {/* Sunlight */}
-      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
-        <div className="text-sm font-medium text-slate-400">Sunlight</div>
-        <div className="mt-2 text-2xl font-bold text-yellow-400">{sunlight.toFixed(1)}</div>
-      </div>
+      <StatCard
+        label="Simulation"
+        value={`${speed.toFixed(1)}x`}
+        color="text-violet-400"
+        subtitle="Execution Speed"
+      />
 
-      {/* Speed */}
-      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
-        <div className="text-sm font-medium text-slate-400">Simulation Speed</div>
-        <div className="mt-2 text-2xl font-bold text-purple-400">{speed.toFixed(2)}x</div>
-      </div>
+      <StatCard
+        label="Temperature"
+        value={temperature.toFixed(2)}
+        color="text-red-400"
+        subtitle="Environmental"
+      />
+
+      <StatCard
+        label="Humidity"
+        value={humidity.toFixed(2)}
+        color="text-blue-400"
+        subtitle="Environmental"
+      />
+
+      <StatCard
+        label="Sunlight"
+        value={sunlight.toFixed(2)}
+        color="text-yellow-400"
+        subtitle="Environmental"
+      />
+
+      <StatCard
+        label="Dominant Diet"
+        value={
+          trophic
+            ? trophic.herbivore >= trophic.carnivore &&
+              trophic.herbivore >= trophic.omnivore
+              ? "Herbivore"
+              : trophic.carnivore >= trophic.omnivore
+                ? "Carnivore"
+                : "Omnivore"
+            : "-"
+        }
+        color="text-pink-400"
+        subtitle="Trophic Leader"
+      />
     </div>
   );
 }

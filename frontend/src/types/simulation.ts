@@ -3,12 +3,20 @@ import type { Environment } from "./environment";
 
 export interface SimulationState {
   type: string;
+
   population: number;
+
   environment: Environment;
+
   organisms: Organism[];
+
   simulation_speed: number;
+
   world_width: number;
   world_height: number;
+
+  species_count: number;
+
   trophic_levels: TrophicLevels;
 }
 

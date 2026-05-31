@@ -3,6 +3,9 @@ from app.services.serializers import (
     serialize_environment,
     serialize_organism,
 )
+from app.analytics.species_tracker import (
+    species_tracker,
+)
 
 
 async def broadcast_simulation_state(engine):
@@ -42,6 +45,9 @@ async def broadcast_simulation_state(engine):
         "environment": serialize_environment(engine.environment),
         "organisms": [serialize_organism(o) for o in visible_organisms],
         "simulation_speed": engine.simulation_speed,
+        "world_width": engine.environment.width,
+        "world_height": engine.environment.height,
+        "species_count": species_tracker.species_count(),
         "trophic_levels": {
             "herbivore": herbivores,
             "carnivore": carnivores,
