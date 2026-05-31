@@ -2,102 +2,76 @@ import { useSimulationStore } from "../../store/simulationStore";
 
 import {
   ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
+  PieChart,
+  Pie,
+  Cell,
   Tooltip,
   Legend,
 } from "recharts";
 
 export default function TrophicChart() {
 
-  const state =
+  const trophic =
     useSimulationStore(
-      (s) => s.state
+      (s) =>
+        s.state?.trophic_levels
     );
 
-  const organisms =
-    state?.organisms;
-
-  let herbivores = 0;
-  let omnivores = 0;
-  let carnivores = 0;
-
-  if (organisms) {
-
-    for (
-      const organism
-      of organisms
-    ) {
-
-      switch (
-      organism.diet_type
-      ) {
-
-        case "herbivore":
-          herbivores++;
-          break;
-
-        case "omnivore":
-          omnivores++;
-          break;
-
-        case "carnivore":
-          carnivores++;
-          break;
-
-        default:
-          break;
-      }
-    }
+  if (!trophic) {
+    return null;
   }
 
   const data = [
     {
-      type: "Herbivores",
-      count: herbivores,
+      name: "Herbivores",
+      value:
+        trophic.herbivore,
+      color: "#22c55e",
     },
     {
-      type: "Omnivores",
-      count: omnivores,
+      name: "Carnivores",
+      value:
+        trophic.carnivore,
+      color: "#ef4444",
     },
     {
-      type: "Carnivores",
-      count: carnivores,
+      name: "Omnivores",
+      value:
+        trophic.omnivore,
+      color: "#a855f7",
     },
   ];
 
   return (
-    <div
-      className="
-      h-64
-      w-full
-      "
-    >
+    <div className="h-64 w-full">
       <ResponsiveContainer
         width="100%"
         height="100%"
       >
-        <BarChart
-          data={data}
-        >
-          <XAxis
-            dataKey="type"
-          />
+        <PieChart>
 
-          <YAxis />
+          <Pie
+            data={data}
+            dataKey="value"
+            nameKey="name"
+            outerRadius={90}
+            label
+          >
+            {data.map(
+              (entry) => (
+                <Cell
+                  key={entry.name}
+                  fill={entry.color}
+                />
+              )
+            )}
+          </Pie>
 
           <Tooltip />
 
           <Legend />
 
-          <Bar
-            dataKey="count"
-            name="Population"
-            fill="#10b981"
-          />
-        </BarChart>
+        </PieChart>
       </ResponsiveContainer>
     </div>
   );

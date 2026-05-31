@@ -2,4 +2,5 @@ export interface Environment {
   temperature: number;
   humidity: number;
   sunlight: number;
+  resource_regeneration_rate: number;
 }

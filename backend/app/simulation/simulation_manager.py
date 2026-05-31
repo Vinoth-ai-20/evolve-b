@@ -35,6 +35,8 @@ class SimulationManager:
             "environment": {
                 "temperature": self.engine.environment.temperature,
                 "humidity": self.engine.environment.humidity,
+                "sunlight": self.engine.environment.sunlight,
+                "resource_regeneration_rate": self.engine.environment.resource_regeneration_rate,
             },
         }
 

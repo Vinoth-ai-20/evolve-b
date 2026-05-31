@@ -60,7 +60,25 @@ class Organism:
     def apply_environmental_pressure(
         self,
         biome,
+        environment=None,
     ):
+
         stress = abs(self.genome.temperature_tolerance - biome.temperature_modifier)
 
-        self.energy -= stress * 0.15
+        energy_loss = stress * 0.15
+
+        if environment:
+
+            global_temperature_stress = abs(
+                self.genome.temperature_tolerance - ((environment.temperature * 2) - 1)
+            )
+
+            energy_loss += global_temperature_stress * 0.10
+
+            if environment.humidity < 0.25:
+                energy_loss += 0.05
+
+            if environment.sunlight < 0.20:
+                energy_loss += 0.03
+
+        self.energy -= energy_loss

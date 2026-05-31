@@ -3,6 +3,10 @@ from pydantic import BaseModel
 
 from app.simulation.simulation_manager import simulation_manager
 
+from app.schemas.environment import (
+    EnvironmentUpdateRequest,
+)
+
 
 class SpeedRequest(BaseModel):
     speed: float
@@ -66,3 +70,18 @@ async def set_speed(request: SpeedRequest) -> StatusResponse:
     return StatusResponse(
         status=f"speed set to {simulation_manager.engine.simulation_speed}x"
     )
+
+
+@router.post("/environment")
+async def update_environment(
+    request: EnvironmentUpdateRequest
+) -> StatusResponse:
+
+    simulation_manager.engine.environment.update_conditions(
+        temperature=request.temperature,
+        humidity=request.humidity,
+        sunlight=request.sunlight,
+        resource_regeneration_rate=request.resource_regeneration_rate,
+    )
+
+    return StatusResponse(status="environment updated")

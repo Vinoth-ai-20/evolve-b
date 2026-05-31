@@ -128,7 +128,14 @@ class SimulationEngine:
 
         self.environment.regenerate_resources()
 
-        population_pressure = carrying_capacity_pressure(len(self.organisms))
+        capacity_multiplier = (
+            0.5 + self.environment.humidity + self.environment.sunlight
+        )
+
+        population_pressure = carrying_capacity_pressure(
+            len(self.organisms),
+            capacity_multiplier,
+        )
 
         for organism in self.organisms:
 
@@ -181,7 +188,10 @@ class SimulationEngine:
                 organism.y,
             )
 
-            organism.apply_environmental_pressure(biome)
+            organism.apply_environmental_pressure(
+                biome,
+                self.environment,
+            )
 
             organism.energy -= population_pressure * 0.05
 
@@ -190,7 +200,10 @@ class SimulationEngine:
                 organism.visible_organisms,
             )
 
-            child = attempt_reproduction(organism)
+            child = attempt_reproduction(
+                organism,
+                self.environment,
+            )
 
             if child:
                 offspring.append(child)

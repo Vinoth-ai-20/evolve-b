@@ -79,7 +79,7 @@ export default function Dashboard() {
 
             {/* Trophic Chart */}
             <div className="rounded-xl border border-slate-800 bg-slate-900 p-4">
-              <h3 className="mb-4 font-medium text-slate-300">Trophic Levels</h3>
+              <h3 className="mb-4 font-medium text-slate-300">Trophic Structure</h3>
               <TrophicChart />
             </div>
 

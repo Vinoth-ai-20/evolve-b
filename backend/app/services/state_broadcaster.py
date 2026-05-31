@@ -18,6 +18,23 @@ async def broadcast_simulation_state(engine):
     # Take top 300 organisms (this is more reasonable than 500)
     visible_organisms = sorted_organisms[:300]
 
+    herbivores = 0
+    carnivores = 0
+    omnivores = 0
+
+    for organism in organisms:
+
+        diet = organism.genome.diet_type
+
+        if diet == 0:
+            herbivores += 1
+
+        elif diet == 1:
+            carnivores += 1
+
+        else:
+            omnivores += 1
+
     payload = {
         "type": "simulation_state",
         "population": len(organisms),
@@ -25,6 +42,11 @@ async def broadcast_simulation_state(engine):
         "environment": serialize_environment(engine.environment),
         "organisms": [serialize_organism(o) for o in visible_organisms],
         "simulation_speed": engine.simulation_speed,
+        "trophic_levels": {
+            "herbivore": herbivores,
+            "carnivore": carnivores,
+            "omnivore": omnivores,
+        },
     }
 
     await websocket_manager.broadcast(payload)
