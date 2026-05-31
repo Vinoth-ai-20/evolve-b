@@ -7,6 +7,10 @@ from app.analytics.species_tracker import (
     species_tracker,
 )
 
+from app.analytics.diversity import (
+    genetic_diversity,
+)
+
 
 async def broadcast_simulation_state(engine):
     """Broadcast simulation state to all connected WebSocket clients"""
@@ -21,6 +25,7 @@ async def broadcast_simulation_state(engine):
     # Take top 300 organisms (this is more reasonable than 500)
     visible_organisms = sorted_organisms[:300]
 
+    # Calculate trophic levels
     herbivores = 0
     carnivores = 0
     omnivores = 0
@@ -38,6 +43,64 @@ async def broadcast_simulation_state(engine):
         else:
             omnivores += 1
 
+    # Dominant species
+    dominant_species = None
+
+    largest = species_tracker.largest_species()
+
+    if largest:
+
+        species_key, members = largest
+
+        dominant_species = {
+            "population": len(members),
+            "share": round(
+                species_tracker.population_share(
+                    members,
+                    len(organisms),
+                ),
+                1,
+            ),
+            "diet": species_tracker.dominant_diet(
+                members,
+            ),
+            "traits": species_tracker.dominant_traits(
+                members,
+            ),
+            "average_energy": round(
+                species_tracker.average_energy(
+                    members,
+                ),
+                1,
+            ),
+            "average_age": round(
+                species_tracker.average_age(
+                    members,
+                ),
+                1,
+            ),
+            "max_generation": species_tracker.max_generation(
+                members,
+            ),
+        }
+
+    # Evolution score
+    diversity = genetic_diversity(organisms)
+
+    if not organisms:
+
+        evolution_score = 0
+
+    else:
+
+        average_generation = sum(organism.generation for organism in organisms) / len(
+            organisms
+        )
+
+        evolution_score = int(
+            species_tracker.species_count() * diversity * average_generation
+        )
+
     payload = {
         "type": "simulation_state",
         "population": len(organisms),
@@ -53,6 +116,9 @@ async def broadcast_simulation_state(engine):
             "carnivore": carnivores,
             "omnivore": omnivores,
         },
+        "dominant_species": dominant_species,
+        "evolution_score": evolution_score,
+        "resource_grid": engine.environment.resources.grid[::4, ::4].tolist(),
     }
 
     await websocket_manager.broadcast(payload)

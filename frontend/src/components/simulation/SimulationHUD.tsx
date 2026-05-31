@@ -22,9 +22,6 @@ export default function SimulationHUD() {
   const species =
     state.species_count ?? 0;
 
-  const trophic =
-    state.trophic_levels;
-
   let status =
     "Healthy";
 
@@ -40,73 +37,139 @@ export default function SimulationHUD() {
       "Stressed";
   }
 
+  const dominant =
+    state.dominant_species;
+
+  const evolutionScore =
+    state.evolution_score ?? 0;
+
   return (
     <div
       className="
-      absolute
-      left-4
-      top-4
-      z-20
-      rounded-xl
-      border
-      border-slate-700
-      bg-slate-950/85
-      p-4
-      text-xs
-      backdrop-blur
-      "
+    absolute
+    left-4
+    top-4
+    z-20
+    w-72
+    rounded-xl
+    border
+    border-slate-700
+    bg-slate-950/85
+    p-4
+    text-xs
+    backdrop-blur
+    "
     >
-      <div className="mb-2 font-semibold text-cyan-400">
-        Simulation Diagnostics
+
+      <div className="mb-3 font-semibold text-cyan-400">
+        Ecosystem Diagnostics
       </div>
 
-      <div>Population: {population}</div>
-      <div>Species: {species}</div>
+      <div className="grid grid-cols-2 gap-y-1">
+
+        <div>Population</div>
+        <div>{population}</div>
+
+        <div>Species</div>
+        <div>{species}</div>
+
+        <div>
+          Evolution Score
+        </div>
+
+        <div className="text-cyan-400 font-semibold">
+          {evolutionScore}
+        </div>
+
+        <div>Zoom</div>
+        <div>
+          {(camera.zoom * 100).toFixed(0)}%
+        </div>
+
+      </div>
+
+      {dominant && (
+
+  <div className="mt-4">
+
+    <div className="mb-2 font-semibold text-yellow-400">
+      Dominant Species
+    </div>
+
+    <div className="space-y-1">
 
       <div>
-        Zoom:
+        Population:
         {" "}
-        {(camera.zoom * 100).toFixed(0)}%
+        {dominant.population}
       </div>
 
       <div>
-        Camera:
+        Share:
         {" "}
-        {camera.x.toFixed(0)}
-        ,
-        {" "}
-        {camera.y.toFixed(0)}
+        {dominant.share}%
       </div>
 
       <div>
-        Herbivores:
+        Diet:
         {" "}
-        {trophic.herbivore}
+        {dominant.diet}
       </div>
 
       <div>
-        Carnivores:
+        Generation:
         {" "}
-        {trophic.carnivore}
+        {dominant.max_generation}
       </div>
 
       <div>
-        Omnivores:
+        Avg Energy:
         {" "}
-        {trophic.omnivore}
+        {dominant.average_energy}
       </div>
+
+      <div>
+        Avg Age:
+        {" "}
+        {dominant.average_age}
+      </div>
+
+    </div>
+
+    <div className="mt-2 flex flex-wrap gap-1">
+
+      {dominant.traits.map(
+        (trait) => (
+          <span
+            key={trait}
+            className="
+            rounded
+            bg-slate-800
+            px-2
+            py-1
+            "
+          >
+            {trait}
+          </span>
+        )
+      )}
+
+    </div>
+
+  </div>
+
+)}
 
       <div
         className="
-        mt-2
-        font-semibold
-        text-emerald-400
-        "
+      mt-4
+      font-semibold
+      text-emerald-400
+      "
       >
-        Status:
-        {" "}
-        {status}
+        Status: {status}
       </div>
+
     </div>
   );
 }

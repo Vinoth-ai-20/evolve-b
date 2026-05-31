@@ -31,6 +31,16 @@ export default function CameraControls() {
     resetZoom();
   };
 
+  const heatmapMode =
+    useSimulationStore(
+      (s) => s.heatmapMode
+    );
+
+  const setHeatmapMode =
+    useSimulationStore(
+      (s) => s.setHeatmapMode
+    );
+
   const followSelected =
     useSimulationStore(
       (s) => s.followSelected
@@ -109,6 +119,55 @@ export default function CameraControls() {
       >
         Home
       </button>
+
+      <div className="flex flex-col gap-2">
+
+        <button
+          onClick={() =>
+            setHeatmapMode(
+              "population"
+            )
+          }
+          className={
+            heatmapMode === "population"
+              ? "rounded bg-cyan-600 px-3 py-2"
+              : "rounded bg-slate-800 px-3 py-2"
+          }
+        >
+          Population
+        </button>
+
+        <button
+          onClick={() =>
+            setHeatmapMode(
+              "resources"
+            )
+          }
+          className={
+            heatmapMode === "resources"
+              ? "rounded bg-cyan-600 px-3 py-2"
+              : "rounded bg-slate-800 px-3 py-2"
+          }
+        >
+          Resources
+        </button>
+
+        <button
+          onClick={() =>
+            setHeatmapMode(
+              "none"
+            )
+          }
+          className={
+            heatmapMode === "none"
+              ? "rounded bg-cyan-600 px-3 py-2"
+              : "rounded bg-slate-800 px-3 py-2"
+          }
+        >
+          Off
+        </button>
+
+      </div>
 
       <div
         className="

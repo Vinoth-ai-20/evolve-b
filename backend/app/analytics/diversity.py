@@ -7,6 +7,10 @@ def genetic_diversity(
     if not organisms:
         return 0.0
 
-    speeds = [o.genome.speed for o in organisms]
+    speed_var = statistics.pvariance([o.genome.speed for o in organisms])
 
-    return statistics.pvariance(speeds)
+    size_var = statistics.pvariance([o.genome.size for o in organisms])
+
+    metabolism_var = statistics.pvariance([o.genome.metabolism for o in organisms])
+
+    return speed_var + size_var + metabolism_var

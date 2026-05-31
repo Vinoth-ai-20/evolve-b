@@ -246,7 +246,10 @@ class SimulationEngine:
             average_fitness,
         )
 
-        collect_metrics(self.organisms)
+        collect_metrics(
+            self.organisms,
+            self.tick_count,
+        )
 
     def pause(self):
 

@@ -8,6 +8,10 @@ from app.analytics.diversity import genetic_diversity
 from app.analytics.history_tracker import history_tracker
 from app.analytics.fitness_tracker import fitness_tracker
 
+from app.analytics.evolution_tracker import (
+    evolution_tracker,
+)
+
 
 class HistoryPoint(BaseModel):
     tick: int
@@ -60,3 +64,13 @@ async def fitness_history() -> list[FitnessPoint]:
         FitnessPoint(tick=point["tick"], fitness=point["fitness"])
         for point in fitness_tracker.history
     ]
+
+
+@router.get("/evolution")
+async def evolution_history():
+    return list(evolution_tracker.history)
+
+
+@router.get("/diversity")
+async def diversity_history():
+    return history_tracker.get_diversity()

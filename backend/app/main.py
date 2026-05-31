@@ -21,6 +21,14 @@ from contextlib import asynccontextmanager
 
 from app.simulation.simulation_manager import simulation_manager
 
+from app.api.routes.events import (
+    router as events_router,
+)
+
+from app.api.routes.intelligence import (
+    router as intelligence_router,
+)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -73,6 +81,18 @@ app.include_router(
     export_router,
     prefix="/api/export",
     tags=["export"],
+)
+
+app.include_router(
+    events_router,
+    prefix="/api/events",
+    tags=["events"],
+)
+
+app.include_router(
+    intelligence_router,
+    prefix="/api/intelligence",
+    tags=["intelligence"],
 )
 
 

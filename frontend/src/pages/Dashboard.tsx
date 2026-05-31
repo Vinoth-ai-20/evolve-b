@@ -16,6 +16,14 @@ import DashboardCard from "../components/layout/DashboardCard";
 import SimulationHUD from "../components/simulation/SimulationHUD";
 import WorldLegend from "../components/simulation/WorldLegend";
 
+import EvolutionTrendsChart from "../components/analytics/EvolutionTrendsChart";
+
+import EventFeed from "../components/analytics/EventFeed";
+
+import DiversityChart from "../components/analytics/DiversityChart";
+
+import EvolutionSummary from "../components/analytics/EvolutionSummary";
+
 import { useSimulationSocket } from "../hooks/useSimulationSocket";
 
 export default function Dashboard() {
@@ -26,15 +34,15 @@ export default function Dashboard() {
     <header className="sticky top-0 z-50 flex h-12 items-center border-b border-slate-800 bg-slate-950 px-6"
     >
       <h1
-  className="
+        className="
   text-xs
   font-extrabold
   tracking-[0.25em]
   text-slate-400
   "
->
-  EVOLVE-B
-</h1>
+      >
+        EVOLVE-B
+      </h1>
 
       <span
         className="ml-3 text-xs text-slate-500"
@@ -93,6 +101,13 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
           <DashboardCard
+            title="Evolution Summary"
+            subtitle="High-level ecosystem intelligence"
+          >
+            <EvolutionSummary />
+          </DashboardCard>
+
+          <DashboardCard
             title="Population Dynamics"
           >
             <PopulationChart />
@@ -105,18 +120,30 @@ export default function Dashboard() {
           </DashboardCard>
 
           <DashboardCard
+            title="Evolution Trends"
+            subtitle="Natural selection across generations"
+          >
+            <EvolutionTrendsChart />
+          </DashboardCard>
+
+          <DashboardCard
             title="Trophic Structure"
           >
             <TrophicChart />
           </DashboardCard>
 
           <DashboardCard
-            title="Genetic Diversity"
-            subtitle="Coming soon"
+            title="Recent Ecosystem Events"
+            subtitle="Evolutionary milestones and ecosystem changes"
           >
-            <div className="flex h-64 items-center justify-center text-slate-500">
-              Diversity analytics will appear here.
-            </div>
+            <EventFeed />
+          </DashboardCard>
+
+          <DashboardCard
+            title="Genetic Diversity"
+            subtitle="Population variance over time"
+          >
+            <DiversityChart />
           </DashboardCard>
 
         </div>

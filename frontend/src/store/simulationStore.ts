@@ -19,6 +19,11 @@ interface SimulationStore {
 
   selectedOrganismId: string | null;
   followSelected: boolean;
+  heatmapMode:
+  | "none"
+  | "population"
+  | "resources"
+  | "predators";
 
   toggleFollowSelected: () => void;
 
@@ -47,6 +52,13 @@ interface SimulationStore {
     x: number,
     y: number
   ) => void;
+  setHeatmapMode: (
+    mode:
+      | "none"
+      | "population"
+      | "resources"
+      | "predators"
+  ) => void;
 }
 
 export const useSimulationStore =
@@ -64,6 +76,14 @@ export const useSimulationStore =
     },
 
     followSelected: false,
+    heatmapMode: "none",
+
+    setHeatmapMode: (
+      mode
+    ) =>
+      set({
+        heatmapMode: mode,
+      }),
 
     toggleFollowSelected: () =>
       set((state) => ({

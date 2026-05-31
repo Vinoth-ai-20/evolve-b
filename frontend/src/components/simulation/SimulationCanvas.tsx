@@ -140,6 +140,11 @@ function drawFrame(
   const camera =
     store.camera;
 
+  const heatmapMode =
+    useSimulationStore
+      .getState()
+      .heatmapMode;
+
   if (
     store.followSelected &&
     selectedId
@@ -174,6 +179,291 @@ function drawFrame(
 
   const rendered: RenderedOrganism[] =
     [];
+
+  if (
+    heatmapMode ===
+    "population"
+  ) {
+
+    const cellSize = 40;
+
+    const density =
+      new Map<
+        string,
+        number
+      >();
+
+    for (
+      const organism
+      of state.organisms
+    ) {
+
+      const gx =
+        Math.floor(
+          organism.x /
+          cellSize
+        );
+
+      const gy =
+        Math.floor(
+          organism.y /
+          cellSize
+        );
+
+      const key =
+        `${gx}:${gy}`;
+
+      density.set(
+        key,
+        (density.get(key) ?? 0)
+        + 1
+      );
+    }
+
+    for (
+      const [
+        key,
+        count,
+      ]
+      of density
+    ) {
+
+      const [
+        gx,
+        gy,
+      ] =
+        key
+          .split(":")
+          .map(Number);
+
+      const x =
+        (
+          gx *
+          cellSize -
+          camera.x
+        ) *
+        scale +
+        canvas.width / 2;
+
+      const y =
+        (
+          gy *
+          cellSize -
+          camera.y
+        ) *
+        scale +
+        canvas.height / 2;
+
+      const intensity =
+        Math.min(
+          1,
+          count / 8
+        );
+
+      const red =
+        Math.floor(
+          255 * intensity
+        );
+
+      const green =
+        Math.floor(
+          255 * (1 - intensity)
+        );
+
+      ctx.fillStyle =
+        `rgba(
+${red},
+${green},
+0,
+0.6
+)`;
+
+      ctx.fillRect(
+        x,
+        y,
+        cellSize *
+        scale,
+        cellSize *
+        scale,
+      );
+    }
+  }
+
+  if (
+    heatmapMode ===
+    "resources"
+  ) {
+
+    const grid =
+      state.resource_grid;
+
+    if (
+      grid &&
+      grid.length
+    ) {
+
+      const cellSize =
+        80;
+
+      for (
+        let gx = 0;
+        gx < grid.length;
+        gx++
+      ) {
+
+        for (
+          let gy = 0;
+          gy <
+          grid[gx].length;
+          gy++
+        ) {
+
+          const value =
+            grid[gx][gy];
+
+          const x =
+            (
+              gx *
+              cellSize -
+              camera.x
+            ) *
+            scale +
+            canvas.width / 2;
+
+          const y =
+            (
+              gy *
+              cellSize -
+              camera.y
+            ) *
+            scale +
+            canvas.height / 2;
+
+          ctx.fillStyle =
+            `rgba(
+0,
+255,
+0,
+${value * 0.35}
+)`;
+
+          ctx.fillRect(
+            x,
+            y,
+            cellSize *
+            scale,
+            cellSize *
+            scale,
+          );
+        }
+      }
+    }
+  }
+
+  if (
+    heatmapMode ===
+    "predators"
+  ) {
+
+    const cellSize = 40;
+
+    const density =
+      new Map<
+        string,
+        number
+      >();
+
+    for (
+      const organism
+      of state.organisms
+    ) {
+
+      if (
+        organism.diet_type !== "carnivore"
+      ) {
+        continue;
+      }
+
+      const gx =
+        Math.floor(
+          organism.x /
+          cellSize
+        );
+
+      const gy =
+        Math.floor(
+          organism.y /
+          cellSize
+        );
+
+      const key =
+        `${gx}:${gy}`;
+
+      density.set(
+        key,
+        (density.get(key) ?? 0)
+        + 1
+      );
+    }
+
+    for (
+      const [
+        key,
+        count,
+      ]
+      of density
+    ) {
+
+      const [
+        gx,
+        gy,
+      ] =
+        key
+          .split(":")
+          .map(Number);
+
+      const x =
+        (
+          gx *
+          cellSize -
+          camera.x
+        ) *
+        scale +
+        canvas.width / 2;
+
+      const y =
+        (
+          gy *
+          cellSize -
+          camera.y
+        ) *
+        scale +
+        canvas.height / 2;
+
+      const intensity =
+        Math.min(
+          1,
+          count / 5
+        );
+
+      ctx.fillStyle =
+        `rgba(
+180,
+0,
+255,
+${intensity * 0.5}
+)`;
+
+      ctx.fillRect(
+        x,
+        y,
+        cellSize *
+        scale,
+        cellSize *
+        scale,
+      );
+    }
+  }
 
   for (
     const organism
