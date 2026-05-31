@@ -102,5 +102,11 @@ class SpeciesTracker:
     ):
         return (len(organisms) / max(1, total_population)) * 100
 
+    def total_kills(
+        self,
+        organisms,
+    ):
+        return sum(o.kills for o in organisms)
+
 
 species_tracker = SpeciesTracker()

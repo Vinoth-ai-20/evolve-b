@@ -14,6 +14,7 @@ REPRODUCTION_COST = 20
 def attempt_reproduction(
     organism,
     environment=None,
+    tick: int = 0,
 ):
     if organism.energy < REPRODUCTION_ENERGY_THRESHOLD:
         return None
@@ -46,7 +47,7 @@ def attempt_reproduction(
     lineage_tracker.register_birth(
         organism.id,
         child.id,
-        environment.tick_count if environment else 0,
+        tick,
     )
 
     return child

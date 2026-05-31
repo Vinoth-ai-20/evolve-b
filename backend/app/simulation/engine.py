@@ -61,6 +61,10 @@ from app.analytics.collectors import (
     collect_metrics,
 )
 
+from app.analytics.species_tracker import (
+    species_tracker,
+)
+
 
 class SimulationEngine:
 
@@ -106,13 +110,27 @@ class SimulationEngine:
 
         while self.running:
 
-            self.tick()
+            try:
 
-            await broadcast_simulation_state(self)
+                print(f"RUN LOOP START tick={self.tick_count}")
 
-            await asyncio.sleep(
-                base_tick_duration / self.simulation_speed
-            )  # use division to speed up, multiplication to slow down
+                self.tick()
+
+                print(f"TICK COMPLETE tick={self.tick_count}")
+
+                await broadcast_simulation_state(self)
+
+                print(f"BROADCAST COMPLETE tick={self.tick_count}")
+
+            except Exception:
+
+                import traceback
+
+                traceback.print_exc()
+
+                raise
+
+            await asyncio.sleep(base_tick_duration / self.simulation_speed)
 
     def tick(self):
 
@@ -194,17 +212,22 @@ class SimulationEngine:
             attempt_predation(
                 organism,
                 organism.visible_organisms,
+                self.tick_count,
             )
 
             child = attempt_reproduction(
                 organism,
                 self.environment,
+                self.tick_count,
             )
 
             if child:
                 offspring.append(child)
 
-        self.organisms.extend(offspring)
+        MAX_POPULATION = 5000
+
+        if len(self.organisms) < MAX_POPULATION:
+            self.organisms.extend(offspring)
 
         print(
             f"Tick={self.tick_count} "
@@ -214,14 +237,35 @@ class SimulationEngine:
 
         self.organisms = [organism for organism in self.organisms if organism.alive]
 
-        if self.tick_count % 10 == 0:
+        if self.tick_count % 100 == 0:
 
-            energies = [o.energy for o in self.organisms]
+            carnivores = sum(1 for o in self.organisms if o.genome.diet_type == 1)
+
+            omnivores = sum(1 for o in self.organisms if o.genome.diet_type == 2)
+
+            herbivores = sum(1 for o in self.organisms if o.genome.diet_type == 0)
 
             print(
-                f"AvgEnergy={sum(energies)/len(energies):.2f} "
-                f"MaxEnergy={max(energies):.2f}"
+                f"Tick={self.tick_count} "
+                f"Pop={len(self.organisms)} "
+                f"Species={species_tracker.species_count()} "
+                f"H={herbivores} "
+                f"C={carnivores} "
+                f"O={omnivores}"
             )
+
+            if self.organisms:
+
+                energies = [o.energy for o in self.organisms]
+
+                print(
+                    f"AvgEnergy={sum(energies)/len(energies):.2f} "
+                    f"MaxEnergy={max(energies):.2f}"
+                )
+
+            else:
+
+                print("Population extinct")
 
         average_fitness = sum(organism.fitness for organism in self.organisms) / max(
             1, len(self.organisms)

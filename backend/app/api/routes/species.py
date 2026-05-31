@@ -22,6 +22,8 @@ class SpeciesInfo(BaseModel):
     max_generation: int
     population_share: float
 
+    total_kills: int
+
 
 router = APIRouter()
 
@@ -56,6 +58,8 @@ async def get_species() -> list[SpeciesInfo]:
             total_population,
         )
 
+        total_kills = species_tracker.total_kills(members)
+
         try:
             traits = species_key.replace("(", "").replace(")", "").split(",")
             avg_size = float(traits[0]) if len(traits) > 0 else 0.0
@@ -80,6 +84,7 @@ async def get_species() -> list[SpeciesInfo]:
                 avg_age=avg_age,
                 max_generation=max_generation,
                 population_share=population_share,
+                total_kills=total_kills,
             )
         )
 

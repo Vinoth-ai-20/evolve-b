@@ -17,6 +17,7 @@ class Organism:
     age: int = 0
     generation: int = 1
     alive: bool = True
+    kills: int = 0
     children_count: int = 0
     fitness: float = 0.0
     food_consumed: float = 0.0

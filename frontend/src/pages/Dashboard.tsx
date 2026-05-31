@@ -37,6 +37,8 @@ import { useSimulationSocket } from "../hooks/useSimulationSocket";
 
 import SimulationCanvas from "../components/simulation/SimulationCanvas";
 
+import PredatorLeaderboard from "../components/analytics/PredatorLeaderboard";
+
 export default function Dashboard() {
 
   useSimulationSocket();
@@ -116,6 +118,13 @@ export default function Dashboard() {
             subtitle="High-level ecosystem intelligence"
           >
             <EvolutionSummary />
+          </DashboardCard>
+
+          <DashboardCard
+            title="Apex Predators"
+            subtitle="Top hunting species in the ecosystem"
+          >
+            <PredatorLeaderboard />
           </DashboardCard>
 
           <DashboardCard

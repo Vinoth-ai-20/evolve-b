@@ -14,4 +14,5 @@ export interface Organism {
   fitness: number;
   children: number;
   diet_type: "herbivore" | "carnivore" | "omnivore";
+  kills: number;
 }

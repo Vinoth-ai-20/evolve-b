@@ -17,6 +17,7 @@ def serialize_organism(
         "fitness": organism.fitness,
         "children": organism.children_count,
         "diet_type": organism.genome.diet_type,
+        "kills": organism.kills,
     }
 
 

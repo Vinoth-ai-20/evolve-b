@@ -45,6 +45,10 @@ from app.api.routes.lineage import (
     router as lineage_router,
 )
 
+from app.api.routes.predators import (
+    router as predators_router,
+)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -139,6 +143,12 @@ app.include_router(
     lineage_router,
     prefix="/api/lineage",
     tags=["Lineage"],
+)
+
+app.include_router(
+    predators_router,
+    prefix="/api/predators",
+    tags=["Predators"],
 )
 
 
