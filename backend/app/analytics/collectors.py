@@ -34,6 +34,18 @@ from app.analytics.diet_dominance_detector import (
     diet_dominance_detector,
 )
 
+from app.analytics.species_history import (
+    species_history,
+)
+
+from app.analytics.milestone_detector import (
+    milestone_detector,
+)
+
+from app.analytics.evolution_pressure import (
+    evolution_pressure,
+)
+
 
 def collect_metrics(
     organisms,
@@ -42,6 +54,20 @@ def collect_metrics(
     diversity = genetic_diversity(organisms)
 
     species_tracker.update(organisms)
+
+    evolution_pressure.update(
+        organisms,
+    )
+
+    species_history.update(
+        tick_count,
+        species_tracker.species_map,
+    )
+
+    species_history.mark_extinct(
+        tick_count,
+        set(species_tracker.species_map.keys()),
+    )
 
     apex_predator_detector.update(
         tick_count,
@@ -69,6 +95,7 @@ def collect_metrics(
     )
 
     history_store.add(
+        tick_count,
         len(organisms),
         diversity,
         species_tracker.species_count(),
@@ -80,3 +107,26 @@ def collect_metrics(
             tick_count,
             organisms,
         )
+
+    average_generation = 0
+
+    if organisms:
+
+        average_generation = sum(o.generation for o in organisms) / len(organisms)
+
+    evolution_score = (
+        species_tracker.species_count()
+        * diversity
+        * max(
+            average_generation,
+            1,
+        )
+    )
+
+    milestone_detector.update(
+        tick_count,
+        len(organisms),
+        species_tracker.species_count(),
+        average_generation,
+        evolution_score,
+    )

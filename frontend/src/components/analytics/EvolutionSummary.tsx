@@ -1,81 +1,37 @@
-import { useEffect, useState } from "react";
-
-import axios from "axios";
-
-interface Summary {
-
-  population: number;
-
-  species_count: number;
-
-  average_generation: number;
-
-  dominant_diet: string;
-
-  dominant_species_share: number;
-
-  evolution_score: number;
-
-  ecosystem_health: string;
-}
+import { useSimulationStore } from "../../store/simulationStore";
 
 export default function EvolutionSummary() {
 
-  const [summary, setSummary] =
-    useState<Summary | null>(
-      null
+  const state =
+    useSimulationStore(
+      (s) => s.state
     );
 
-  useEffect(() => {
-
-    const loadSummary =
-      async () => {
-
-        try {
-
-          const response =
-            await axios.get<Summary>(
-              "http://localhost:8000/api/intelligence/summary"
-            );
-
-          setSummary(
-            response.data
-          );
-
-        } catch (
-        error
-        ) {
-
-          console.error(
-            error
-          );
-
-        }
-      };
-
-    loadSummary();
-
-    const interval =
-      setInterval(
-        loadSummary,
-        5000
-      );
-
-    return () =>
-      clearInterval(
-        interval
-      );
-
-  }, []);
-
-  if (!summary) {
-
+  if (!state) {
     return (
       <div>
         Loading...
       </div>
     );
   }
+
+  const population =
+    state.population ?? 0;
+
+  const speciesCount =
+    state.species_count ?? 0;
+
+  const averageGeneration =
+    state.average_generation ?? 0;
+
+  const evolutionScore =
+    state.evolution_score ?? 0;
+
+  const ecosystemHealth =
+    state.ecosystem_health ?? "Unknown";
+
+  const dominantSpecies =
+    state.dominant_species;
 
   return (
     <div
@@ -87,11 +43,11 @@ export default function EvolutionSummary() {
 
       <div className="flex justify-between">
         <span>
-          Population Trend
+          Population
         </span>
 
         <span className="font-semibold">
-          {summary.population}
+          {population}
         </span>
       </div>
 
@@ -101,7 +57,7 @@ export default function EvolutionSummary() {
         </span>
 
         <span className="font-semibold">
-          {summary.species_count}
+          {speciesCount}
         </span>
       </div>
 
@@ -111,7 +67,17 @@ export default function EvolutionSummary() {
         </span>
 
         <span className="font-semibold">
-          {summary.average_generation}
+          {averageGeneration.toFixed(1)}
+        </span>
+      </div>
+
+      <div className="flex justify-between">
+        <span>
+          Diversity
+        </span>
+
+        <span className="font-semibold">
+          {(state.diversity ?? 0).toFixed(3)}
         </span>
       </div>
 
@@ -121,7 +87,7 @@ export default function EvolutionSummary() {
         </span>
 
         <span className="font-semibold">
-          {summary.dominant_diet}
+          {dominantSpecies?.diet ?? "Unknown"}
         </span>
       </div>
 
@@ -131,7 +97,7 @@ export default function EvolutionSummary() {
         </span>
 
         <span className="font-semibold">
-          {summary.dominant_species_share}%
+          {dominantSpecies?.share ?? 0}%
         </span>
       </div>
 
@@ -141,7 +107,7 @@ export default function EvolutionSummary() {
         </span>
 
         <span className="font-semibold text-cyan-400">
-          {summary.evolution_score}
+          {evolutionScore}
         </span>
       </div>
 
@@ -151,12 +117,17 @@ export default function EvolutionSummary() {
         </span>
 
         <span
-          className="
-          font-semibold
-          text-emerald-400
-          "
+          className={`
+            font-semibold
+            ${ecosystemHealth === "Healthy"
+              ? "text-emerald-400"
+              : ecosystemHealth === "Stressed"
+                ? "text-amber-400"
+                : "text-red-400"
+            }
+          `}
         >
-          {summary.ecosystem_health}
+          {ecosystemHealth}
         </span>
       </div>
 

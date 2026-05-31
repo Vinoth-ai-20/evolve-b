@@ -87,6 +87,24 @@ async def broadcast_simulation_state(engine):
     # Evolution score
     diversity = genetic_diversity(organisms)
 
+    average_generation = 0
+
+    if organisms:
+
+        average_generation = round(
+            sum(organism.generation for organism in organisms) / len(organisms),
+            1,
+        )
+
+    if len(organisms) < 50:
+        ecosystem_health = "Critical"
+
+    elif species_tracker.species_count() < 3:
+        ecosystem_health = "Stressed"
+
+    else:
+        ecosystem_health = "Healthy"
+
     if not organisms:
 
         evolution_score = 0
@@ -119,6 +137,12 @@ async def broadcast_simulation_state(engine):
         "dominant_species": dominant_species,
         "evolution_score": evolution_score,
         "resource_grid": engine.environment.resources.grid[::4, ::4].tolist(),
+        "diversity": round(
+            diversity,
+            4,
+        ),
+        "average_generation": average_generation,
+        "ecosystem_health": ecosystem_health,
     }
 
     await websocket_manager.broadcast(payload)

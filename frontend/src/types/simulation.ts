@@ -13,26 +13,20 @@ export interface DominantSpecies {
 
 export interface SimulationState {
   type: string;
-
   population: number;
-
   environment: Environment;
-
   organisms: Organism[];
-
   simulation_speed: number;
-
   world_width: number;
   world_height: number;
-
   species_count: number;
-
   trophic_levels: TrophicLevels;
-
   evolution_score: number;
-
   dominant_species: DominantSpecies | null;
   resource_grid: number[][];
+  diversity: number;
+  average_generation: number;
+  ecosystem_health: string;
 }
 
 export interface TrophicLevels {

@@ -5,7 +5,7 @@ from app.simulation.simulation_manager import simulation_manager
 from app.analytics.species_tracker import species_tracker
 from app.analytics.trait_analysis import average_traits
 from app.analytics.diversity import genetic_diversity
-from app.analytics.history_tracker import history_tracker
+from app.analytics.history_store import history_store
 from app.analytics.fitness_tracker import fitness_tracker
 
 from app.analytics.evolution_tracker import (
@@ -42,11 +42,12 @@ async def stats() -> AnalyticsStats:
 
 
 @router.get("/history")
-async def population_history() -> dict:
-    """Get population and diversity history"""
+async def population_history():
+
     return {
-        "population": history_tracker.get_population(),
-        "diversity": history_tracker.get_diversity(),
+        "population": list(history_store.population),
+        "diversity": list(history_store.diversity),
+        "species_count": list(history_store.species_count),
     }
 
 
@@ -73,4 +74,4 @@ async def evolution_history():
 
 @router.get("/diversity")
 async def diversity_history():
-    return history_tracker.get_diversity()
+    return list(history_store.diversity)

@@ -24,6 +24,16 @@ import DiversityChart from "../components/analytics/DiversityChart";
 
 import EvolutionSummary from "../components/analytics/EvolutionSummary";
 
+import MilestonesPanel from "../components/analytics/MilestonesPanel";
+
+import SpeciesCemetery from "../components/analytics/SpeciesCemetery";
+
+import EvolutionIntelligence from "../components/analytics/EvolutionIntelligence";
+
+import EvolutionReport from "../components/analytics/EvolutionReport";
+
+import LineagePanel from "../components/analytics/LineagePanel";
+
 import { useSimulationSocket } from "../hooks/useSimulationSocket";
 
 export default function Dashboard() {
@@ -108,6 +118,13 @@ export default function Dashboard() {
           </DashboardCard>
 
           <DashboardCard
+            title="Evolution Report"
+            subtitle="Automated ecosystem analysis"
+          >
+            <EvolutionReport />
+          </DashboardCard>
+
+          <DashboardCard
             title="Population Dynamics"
           >
             <PopulationChart />
@@ -127,6 +144,20 @@ export default function Dashboard() {
           </DashboardCard>
 
           <DashboardCard
+            title="Evolution Intelligence"
+            subtitle="Trait selection and adaptation analysis"
+          >
+            <EvolutionIntelligence />
+          </DashboardCard>
+
+          <DashboardCard
+            title="Evolutionary Lineages"
+            subtitle="Most successful family trees"
+          >
+            <LineagePanel />
+          </DashboardCard>
+
+          <DashboardCard
             title="Trophic Structure"
           >
             <TrophicChart />
@@ -137,6 +168,20 @@ export default function Dashboard() {
             subtitle="Evolutionary milestones and ecosystem changes"
           >
             <EventFeed />
+          </DashboardCard>
+
+          <DashboardCard
+            title="Evolution Milestones"
+            subtitle="Major evolutionary achievements"
+          >
+            <MilestonesPanel />
+          </DashboardCard>
+
+          <DashboardCard
+            title="Species Cemetery"
+            subtitle="Extinct evolutionary lineages"
+          >
+            <SpeciesCemetery />
           </DashboardCard>
 
           <DashboardCard

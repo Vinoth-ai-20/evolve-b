@@ -25,10 +25,6 @@ from app.simulation.carrying_capacity import (
     carrying_capacity_pressure,
 )
 
-from app.analytics.history_tracker import (
-    history_tracker,
-)
-
 from app.analytics.diversity import (
     genetic_diversity,
 )
@@ -226,16 +222,6 @@ class SimulationEngine:
                 f"AvgEnergy={sum(energies)/len(energies):.2f} "
                 f"MaxEnergy={max(energies):.2f}"
             )
-
-        history_tracker.add_population(
-            self.tick_count,
-            len(self.organisms),
-        )
-
-        history_tracker.add_diversity(
-            self.tick_count,
-            genetic_diversity(self.organisms),
-        )
 
         average_fitness = sum(organism.fitness for organism in self.organisms) / max(
             1, len(self.organisms)

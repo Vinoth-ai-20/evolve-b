@@ -46,6 +46,7 @@ def attempt_reproduction(
     lineage_tracker.register_birth(
         organism.id,
         child.id,
+        environment.tick_count if environment else 0,
     )
 
     return child

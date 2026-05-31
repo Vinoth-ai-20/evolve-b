@@ -29,6 +29,22 @@ from app.api.routes.intelligence import (
     router as intelligence_router,
 )
 
+from app.api.routes.milestones import router as milestones_router
+
+from app.api.routes.cemetery import router as cemetery_router
+
+from app.api.routes.evolution_intelligence import (
+    router as evolution_intelligence_router,
+)
+
+from app.api.routes.reports import (
+    router as reports_router,
+)
+
+from app.api.routes.lineage import (
+    router as lineage_router,
+)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -93,6 +109,36 @@ app.include_router(
     intelligence_router,
     prefix="/api/intelligence",
     tags=["intelligence"],
+)
+
+app.include_router(
+    milestones_router,
+    prefix="/api/milestones",
+    tags=["Milestones"],
+)
+
+app.include_router(
+    cemetery_router,
+    prefix="/api/cemetery",
+    tags=["Cemetery"],
+)
+
+app.include_router(
+    evolution_intelligence_router,
+    prefix="/api/evolution-intelligence",
+    tags=["Evolution Intelligence"],
+)
+
+app.include_router(
+    reports_router,
+    prefix="/api/reports",
+    tags=["Reports"],
+)
+
+app.include_router(
+    lineage_router,
+    prefix="/api/lineage",
+    tags=["Lineage"],
 )
 
 
