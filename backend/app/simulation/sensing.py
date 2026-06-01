@@ -28,6 +28,9 @@ def sense_nearby_organisms(
 
     vision_distance = organism.genome.vision_range * 50
 
+    if organism.genome.diet_type == 1:
+        vision_distance *= 1.20
+
     for other in nearby:
 
         if other.id == organism.id:
@@ -105,3 +108,50 @@ def sense_nearest_food(
                 )
 
     return best_food
+
+
+def nearest_prey(organism):
+
+    prey = None
+    best_distance = float("inf")
+
+    for other in organism.visible_organisms:
+
+        if other.id == organism.id:
+            continue
+
+        if other.genome.diet_type == 1:
+            continue
+
+        dx = other.x - organism.x
+        dy = other.y - organism.y
+
+        distance = dx * dx + dy * dy
+
+        if distance < best_distance:
+            best_distance = distance
+            prey = other
+
+    return prey
+
+
+def nearest_predator(organism):
+
+    predator = None
+    best_distance = float("inf")
+
+    for other in organism.visible_organisms:
+
+        if other.genome.diet_type != 1:
+            continue
+
+        dx = other.x - organism.x
+        dy = other.y - organism.y
+
+        distance = dx * dx + dy * dy
+
+        if distance < best_distance:
+            best_distance = distance
+            predator = other
+
+    return predator

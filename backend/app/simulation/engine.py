@@ -65,6 +65,15 @@ from app.analytics.species_tracker import (
     species_tracker,
 )
 
+from app.simulation.sensing import (
+    nearest_prey,
+    nearest_predator,
+)
+
+from app.simulation.behavior import (
+    move_away_from_target,
+)
+
 
 class SimulationEngine:
 
@@ -170,19 +179,73 @@ class SimulationEngine:
                 self.environment,
             )
 
-            if organism.visible_food:
+            if organism.genome.diet_type == 1:
 
-                move_toward_target(
-                    organism,
-                    organism.visible_food.x,
-                    organism.visible_food.y,
-                )
+                prey = nearest_prey(organism)
+
+                if prey:
+
+                    move_toward_target(
+                        organism,
+                        prey.x,
+                        prey.y,
+                    )
+
+                elif organism.visible_food:
+
+                    move_toward_target(
+                        organism,
+                        organism.visible_food.x,
+                        organism.visible_food.y,
+                    )
+
+                else:
+
+                    random_exploration(
+                        organism,
+                    )
+
+            elif organism.genome.diet_type == 0:
+
+                predator = nearest_predator(organism)
+
+                if predator:
+
+                    move_away_from_target(
+                        organism,
+                        predator.x,
+                        predator.y,
+                    )
+
+                elif organism.visible_food:
+
+                    move_toward_target(
+                        organism,
+                        organism.visible_food.x,
+                        organism.visible_food.y,
+                    )
+
+                else:
+
+                    random_exploration(
+                        organism,
+                    )
 
             else:
 
-                random_exploration(
-                    organism,
-                )
+                if organism.visible_food:
+
+                    move_toward_target(
+                        organism,
+                        organism.visible_food.x,
+                        organism.visible_food.y,
+                    )
+
+                else:
+
+                    random_exploration(
+                        organism,
+                    )
 
             organism.update()
 
@@ -192,6 +255,15 @@ class SimulationEngine:
                 organism.x,
                 organism.y,
             )
+
+            # Diet specialization
+            if organism.genome.diet_type == 0:
+                # Herbivore bonus
+                food *= 1.30
+
+            elif organism.genome.diet_type == 2:
+                # Omnivore penalty
+                food *= 0.80
 
             organism.energy += food * organism.genome.energy_efficiency
 

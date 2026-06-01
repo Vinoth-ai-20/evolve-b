@@ -42,3 +42,24 @@ def random_exploration(
         )
         * organism.genome.speed
     )
+
+
+def move_away_from_target(
+    organism,
+    target_x,
+    target_y,
+):
+
+    dx = organism.x - target_x
+    dy = organism.y - target_y
+
+    distance = math.sqrt(dx * dx + dy * dy)
+
+    if distance < 1:
+        return
+
+    speed = organism.genome.speed * 2.5
+
+    organism.x += (dx / distance) * speed
+
+    organism.y += (dy / distance) * speed

@@ -27,7 +27,9 @@ def mutate_genome(genome: Genome) -> Genome:
         if field_name == "diet_type":
             continue
 
-        if random.random() < MUTATION_RATE:
+        effective_rate = MUTATION_RATE * (1 - genome.mutation_resistance)
+
+        if random.random() < effective_rate:
             current = getattr(mutated, field_name)
 
             if isinstance(current, float):

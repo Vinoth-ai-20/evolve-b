@@ -4,7 +4,7 @@ from app.analytics.event_tracker import event_tracker
 
 PREDATOR_RANGE = 25
 
-ENERGY_GAIN_FROM_PREY = 80
+ENERGY_GAIN_FROM_PREY = 120
 
 
 def attempt_predation(
