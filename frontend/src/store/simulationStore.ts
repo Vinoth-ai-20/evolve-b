@@ -25,6 +25,8 @@ interface SimulationStore {
   | "resources"
   | "predators";
 
+  tickInterval: number;
+
   toggleFollowSelected: () => void;
 
   setState: (state: SimulationState) => void;
@@ -52,6 +54,12 @@ interface SimulationStore {
     x: number,
     y: number
   ) => void;
+
+  setZoomAndCamera: (
+    zoom: number,
+    x: number,
+    y: number
+  ) => void;
   setHeatmapMode: (
     mode:
       | "none"
@@ -59,6 +67,8 @@ interface SimulationStore {
       | "resources"
       | "predators"
   ) => void;
+
+  setTickInterval: (ms: number) => void;
 }
 
 export const useSimulationStore =
@@ -77,6 +87,12 @@ export const useSimulationStore =
 
     followSelected: false,
     heatmapMode: "none",
+    tickInterval: 50,
+
+    setTickInterval: (ms) =>
+      set({
+        tickInterval: ms,
+      }),
 
     setHeatmapMode: (
       mode
@@ -153,7 +169,15 @@ export const useSimulationStore =
         },
       })),
 
-
+    setZoomAndCamera: (zoom, x, y) =>
+      set((state) => ({
+        ...state,
+        camera: {
+          zoom,
+          x,
+          y,
+        },
+      })),
 
     setState: (
       state: SimulationState

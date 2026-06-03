@@ -48,6 +48,13 @@ class LineageTracker:
 
         return result
 
+    def lineage_size(
+        self,
+        organism_id: str,
+    ):
+
+        return len(self.descendants(organism_id))
+
     def top_lineages(
         self,
         limit: int = 20,
@@ -57,11 +64,18 @@ class LineageTracker:
 
         for parent_id, children in self.children.items():
 
+            descendants = self.descendants(parent_id)
+
             lineages.append(
                 {
                     "organism_id": parent_id,
                     "children": len(children),
-                    "descendants": len(self.descendants(parent_id)),
+                    "descendants": len(descendants),
+                    "lineage_size": (len(descendants) + 1),
+                    "birth_tick": self.birth_tick.get(
+                        parent_id,
+                        0,
+                    ),
                 }
             )
 
@@ -71,6 +85,57 @@ class LineageTracker:
         )
 
         return lineages[:limit]
+
+    def legendary_lineages(
+        self,
+        min_descendants: int = 100,
+    ):
+
+        result = []
+
+        for parent_id in self.children:
+
+            descendant_count = len(self.descendants(parent_id))
+
+            if descendant_count >= min_descendants:
+
+                result.append(
+                    {
+                        "organism_id": parent_id,
+                        "descendants": descendant_count,
+                    }
+                )
+
+        result.sort(
+            key=lambda x: x["descendants"],
+            reverse=True,
+        )
+
+        return result
+
+    def lineage_tree(
+        self,
+        organism_id: str,
+    ):
+
+        return {
+            "id": organism_id,
+            "children": [
+                self.lineage_tree(child)
+                for child in self.children.get(
+                    organism_id,
+                    [],
+                )
+            ],
+        }
+
+    def roots(self):
+
+        all_children = set(self.parent_map.keys())
+
+        all_parents = set(self.children.keys())
+
+        return list(all_parents - all_children)
 
 
 lineage_tracker = LineageTracker()

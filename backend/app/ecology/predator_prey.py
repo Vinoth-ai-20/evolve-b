@@ -24,7 +24,7 @@ def attempt_predation(
         if not prey.alive:
             continue
 
-        if prey.genome.diet_type == 2:
+        if prey.genome.diet_type == 1:
             continue
 
         dx = predator.x - prey.x
@@ -36,7 +36,12 @@ def attempt_predation(
 
             prey.alive = False
 
-            predator.energy += ENERGY_GAIN_FROM_PREY
+            energy_gain = ENERGY_GAIN_FROM_PREY
+
+            if predator.genome.diet_type == 2:
+                energy_gain *= 0.6
+
+            predator.energy += energy_gain
 
             predator.kills += 1
 

@@ -3,8 +3,8 @@ from copy import deepcopy
 
 from app.genetics.genome import Genome
 
-MUTATION_RATE = 0.08
-MUTATION_MAGNITUDE = 0.15
+MUTATION_RATE = 0.03
+MUTATION_MAGNITUDE = 0.08
 DIET_MUTATION_RATE = 0.02  # Lower rate for diet changes
 
 

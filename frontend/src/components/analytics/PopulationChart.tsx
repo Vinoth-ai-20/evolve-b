@@ -1,3 +1,4 @@
+import { memo } from "react";
 import {
   ResponsiveContainer,
   LineChart,
@@ -9,7 +10,7 @@ import {
 
 import { useSimulationStore } from "../../store/simulationStore";
 
-export default function PopulationChart() {
+function PopulationChartComponent() {
 
   const data =
     useSimulationStore(
@@ -53,3 +54,5 @@ export default function PopulationChart() {
     </div>
   );
 }
+
+export default memo(PopulationChartComponent);

@@ -26,6 +26,16 @@ class EvolutionTracker:
                 "avg_lifespan": sum(o.genome.lifespan for o in organisms)
                 / len(organisms),
                 "avg_generation": sum(o.generation for o in organisms) / len(organisms),
+                "avg_vision": sum(o.genome.vision_range for o in organisms)
+                / len(organisms),
+                "avg_efficiency": sum(o.genome.energy_efficiency for o in organisms)
+                / len(organisms),
+                "avg_camouflage": sum(o.genome.camouflage for o in organisms)
+                / len(organisms),
+                "avg_temperature_tolerance": sum(
+                    o.genome.temperature_tolerance for o in organisms
+                )
+                / len(organisms),
             }
         )
 

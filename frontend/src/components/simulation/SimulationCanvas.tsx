@@ -180,6 +180,68 @@ function drawFrame(
   const rendered: RenderedOrganism[] =
     [];
 
+  if (state.resource_hotspots) {
+
+    for (const hotspot of state.resource_hotspots) {
+
+      const x =
+        (
+          hotspot.x -
+          camera.x
+        ) *
+        scale +
+        canvas.width / 2;
+
+      const y =
+        (
+          hotspot.y -
+          camera.y
+        ) *
+        scale +
+        canvas.height / 2;
+
+      const radius =
+        Math.max(
+          20,
+          60 * scale,
+        );
+
+      const gradient =
+        ctx.createRadialGradient(
+          x,
+          y,
+          0,
+          x,
+          y,
+          radius,
+        );
+
+      gradient.addColorStop(
+        0,
+        "rgba(0,255,120,0.35)",
+      );
+
+      gradient.addColorStop(
+        1,
+        "rgba(0,255,120,0)",
+      );
+
+      ctx.fillStyle = gradient;
+
+      ctx.beginPath();
+
+      ctx.arc(
+        x,
+        y,
+        radius,
+        0,
+        Math.PI * 2,
+      );
+
+      ctx.fill();
+    }
+  }
+
   if (
     heatmapMode ===
     "population"

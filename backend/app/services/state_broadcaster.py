@@ -11,6 +11,10 @@ from app.analytics.diversity import (
     genetic_diversity,
 )
 
+from app.environment.climate_events import (
+    climate_event_manager,
+)
+
 
 async def broadcast_simulation_state(engine):
     """Broadcast simulation state to all connected WebSocket clients"""
@@ -137,12 +141,20 @@ async def broadcast_simulation_state(engine):
         "dominant_species": dominant_species,
         "evolution_score": evolution_score,
         "resource_grid": engine.environment.resources.grid[::4, ::4].tolist(),
+        "resource_hotspots": [
+            {
+                "x": hotspot[0] * 20,
+                "y": hotspot[1] * 20,
+            }
+            for hotspot in engine.environment.resources.hotspots
+        ],
         "diversity": round(
             diversity,
             4,
         ),
         "average_generation": average_generation,
         "ecosystem_health": ecosystem_health,
+        "active_climate_event": climate_event_manager.active_event,
     }
 
     await websocket_manager.broadcast(payload)

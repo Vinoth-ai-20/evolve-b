@@ -63,3 +63,25 @@ def move_away_from_target(
     organism.x += (dx / distance) * speed
 
     organism.y += (dy / distance) * speed
+
+
+def move_to_memory(
+    organism,
+):
+
+    move_toward_target(
+        organism,
+        organism.best_food_x,
+        organism.best_food_y,
+    )
+
+
+def move_toward_home(
+    organism,
+):
+
+    move_toward_target(
+        organism,
+        organism.home_x,
+        organism.home_y,
+    )

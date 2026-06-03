@@ -1,11 +1,10 @@
 import random
 
-from app.genetics.inheritance import inherit_genome
 from app.genetics.lineage import lineage_tracker
 from app.genetics.mutation import mutate_genome
+from app.genetics.inheritance import recombine_genomes
 
 from app.simulation.organism import Organism
-from app.schemas import environment
 
 REPRODUCTION_ENERGY_THRESHOLD = 105
 REPRODUCTION_COST = 20
@@ -13,36 +12,55 @@ REPRODUCTION_COST = 20
 
 def attempt_reproduction(
     organism,
-    environment=None,
+    mate,
     tick: int = 0,
 ):
+    if mate is None:
+        return None
+
     if organism.energy < REPRODUCTION_ENERGY_THRESHOLD:
         return None
 
-    reproduction_probability = 0.05 * organism.genome.fertility
+    if mate.energy < REPRODUCTION_ENERGY_THRESHOLD:
+        return None
 
-    if environment:
-
-        reproduction_probability *= 0.5 + environment.humidity
-
-        reproduction_probability *= 0.5 + environment.sunlight
+    reproduction_probability = 0.08 * organism.genome.fertility
 
     if random.random() > reproduction_probability:
         return None
 
-    child_genome = inherit_genome(organism.genome)
+    child_genome = recombine_genomes(
+        organism.genome,
+        mate.genome,
+    )
+
     child_genome = mutate_genome(child_genome)
 
     child = Organism(
-        x=organism.x + random.uniform(-10, 10),
-        y=organism.y + random.uniform(-10, 10),
+        x=(organism.x + random.uniform(-10, 10)),
+        y=(organism.y + random.uniform(-10, 10)),
         genome=child_genome,
     )
 
-    child.generation = organism.generation + 1
+    child.home_x = (organism.home_x + mate.home_x) / 2
+
+    child.home_y = (organism.home_y + mate.home_y) / 2
+
+    child.territory_strength = 0.25 
+
+    child.generation = (
+        max(
+            organism.generation,
+            mate.generation,
+        )
+        + 1
+    )
 
     organism.energy -= REPRODUCTION_COST
+    mate.energy -= REPRODUCTION_COST
+
     organism.children_count += 1
+    mate.children_count += 1
 
     lineage_tracker.register_birth(
         organism.id,

@@ -5,6 +5,10 @@ import random
 from app.genetics.genome import Genome
 from app.genetics.phenotype import Phenotype
 
+from app.ecology.disease import (
+    disease_manager,
+)
+
 
 @dataclass
 class Organism:
@@ -27,6 +31,17 @@ class Organism:
 
     phenotype: Phenotype = field(init=False)
 
+    infected: bool = False
+    infection_timer: int = 0
+
+    best_food_x: float = 0.0
+    best_food_y: float = 0.0
+    best_food_amount: float = 0.0
+
+    home_x: float = 0.0
+    home_y: float = 0.0
+    territory_strength: float = 0.0
+
     def __post_init__(self):
 
         self.phenotype = Phenotype.from_genome(self.genome)
@@ -38,6 +53,9 @@ class Organism:
         self.children_count = 0
         self.fitness = 0.0
 
+        self.home_x = self.x
+        self.home_y = self.y
+
     def update(self):
         if not self.alive:
             return
@@ -46,6 +64,8 @@ class Organism:
 
         self.vx += random.uniform(-1, 1) * 0.2
         self.vy += random.uniform(-1, 1) * 0.2
+
+        self.territory_strength *= 0.999
 
         self.x += self.vx * self.genome.speed
         self.y += self.vy * self.genome.speed
@@ -57,6 +77,26 @@ class Organism:
 
         if self.age > self.genome.lifespan:
             self.alive = False
+
+        if self.infected:
+
+            self.energy -= 0.10
+
+            self.infection_timer -= 1
+
+            if self.infection_timer <= 0:
+
+                self.infected = False
+
+        if self.best_food_amount > 0.8:
+
+            self.home_x = self.best_food_x
+            self.home_y = self.best_food_y
+
+            self.territory_strength = min(
+                1.0,
+                self.territory_strength + 0.01,
+            )
 
     def apply_environmental_pressure(
         self,

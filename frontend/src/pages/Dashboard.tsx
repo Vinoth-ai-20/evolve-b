@@ -35,12 +35,13 @@ import LineagePanel from "../components/analytics/LineagePanel";
 
 import { useSimulationSocket } from "../hooks/useSimulationSocket";
 
-import SimulationCanvas from "../components/simulation/SimulationCanvas";
-
 import PredatorLeaderboard from "../components/analytics/PredatorLeaderboard";
 
-export default function Dashboard() {
+import PhylogeneticTree from "../components/analytics/PhylogeneticTree";
 
+import PixiSimulationCanvas from "../components/simulation/PixiSimulationCanvas";
+
+export default function Dashboard() {
   useSimulationSocket();
 
   return (<div className="min-h-screen bg-slate-950 text-slate-100">
@@ -74,23 +75,26 @@ export default function Dashboard() {
           <DashboardCard
             title="Simulation World"
             subtitle="Realtime ecosystem visualization"
+            className="h-full"
           >
-            <div className="relative">
+            <div className="relative h-full min-h-0">
               <SimulationHUD />
               <WorldLegend />
               <CameraControls />
-              <SimulationCanvas />
+              <PixiSimulationCanvas />
             </div>
           </DashboardCard>
 
         </section>
 
-        <aside className="col-span-12 xl:col-span-3">
-          <SpeciesPanel />
+        <aside className="col-span-12 xl:col-span-3 flex flex-col h-full">
+          <div className="flex-1">
+            <SpeciesPanel />
+          </div>
         </aside>
 
-
       </div>
+
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
 
         <SpeciesInspector />
@@ -101,7 +105,7 @@ export default function Dashboard() {
 
       <section className="mt-8">
 
-        <div className="mb-4">
+        <div className="mb-6">
           <h2 className="text-2xl font-semibold">
             Ecosystem Analytics
           </h2>
@@ -128,13 +132,6 @@ export default function Dashboard() {
           </DashboardCard>
 
           <DashboardCard
-            title="Evolution Report"
-            subtitle="Automated ecosystem analysis"
-          >
-            <EvolutionReport />
-          </DashboardCard>
-
-          <DashboardCard
             title="Population Dynamics"
           >
             <PopulationChart />
@@ -154,6 +151,12 @@ export default function Dashboard() {
           </DashboardCard>
 
           <DashboardCard
+            title="Trophic Structure"
+          >
+            <TrophicChart />
+          </DashboardCard>
+
+          <DashboardCard
             title="Evolution Intelligence"
             subtitle="Trait selection and adaptation analysis"
           >
@@ -168,9 +171,17 @@ export default function Dashboard() {
           </DashboardCard>
 
           <DashboardCard
-            title="Trophic Structure"
+            title="Evolution Report"
+            subtitle="Automated ecosystem analysis"
           >
-            <TrophicChart />
+            <EvolutionReport />
+          </DashboardCard>
+
+          <DashboardCard
+            title="Phylogenetic Tree"
+            subtitle="Evolutionary branching history"
+          >
+            <PhylogeneticTree />
           </DashboardCard>
 
           <DashboardCard

@@ -19,6 +19,8 @@ export default function DashboardCard({
         bg-slate-900/80
         backdrop-blur
         shadow-lg
+        flex
+        flex-col
         ${className}
       `}
     > <div className="border-b border-slate-800 px-5 py-4"> <h3 className="text-lg font-semibold text-slate-100">
@@ -31,7 +33,7 @@ export default function DashboardCard({
         )}
       </div>
 
-      <div className="p-5">
+      <div className="p-5 flex-1 overflow-auto">
         {children}
       </div>
     </div>

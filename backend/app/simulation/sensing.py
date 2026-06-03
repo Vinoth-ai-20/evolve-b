@@ -112,8 +112,9 @@ def sense_nearest_food(
 
 def nearest_prey(organism):
 
-    prey = None
-    best_distance = float("inf")
+    best_prey = None
+
+    best_score = float("inf")
 
     for other in organism.visible_organisms:
 
@@ -126,13 +127,24 @@ def nearest_prey(organism):
         dx = other.x - organism.x
         dy = other.y - organism.y
 
-        distance = dx * dx + dy * dy
+        distance = (dx * dx + dy * dy) ** 0.5
 
-        if distance < best_distance:
-            best_distance = distance
-            prey = other
+        score = distance
 
-    return prey
+        score -= other.age * 0.05
+
+        score -= other.energy * 0.02
+
+        if other.infected:
+            score *= 0.5
+
+        if score < best_score:
+
+            best_score = score
+
+            best_prey = other
+
+    return best_prey
 
 
 def nearest_predator(organism):
@@ -155,3 +167,32 @@ def nearest_predator(organism):
             predator = other
 
     return predator
+
+
+def find_mate(organism):
+
+    best_mate = None
+
+    best_energy = -1
+
+    for other in organism.visible_organisms:
+
+        if other.id == organism.id:
+            continue
+
+        if not other.alive:
+            continue
+
+        if other.energy < 100:
+            continue
+
+        if other.genome.diet_type != organism.genome.diet_type:
+            continue
+
+        if other.energy > best_energy:
+
+            best_energy = other.energy
+
+            best_mate = other
+
+    return best_mate

@@ -27,6 +27,11 @@ export interface SimulationState {
   diversity: number;
   average_generation: number;
   ecosystem_health: string;
+  active_climate_event: string | null;
+  resource_hotspots: {
+    x: number;
+    y: number;
+  }[];
 }
 
 export interface TrophicLevels {

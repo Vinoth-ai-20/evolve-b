@@ -11,6 +11,11 @@ interface Lineage {
   descendants: number;
 }
 
+interface LineageResponse {
+  top_lineages: Lineage[];
+  legendary_lineages: unknown[];
+}
+
 export default function LineagePanel() {
 
   const [lineages, setLineages] =
@@ -24,14 +29,12 @@ export default function LineagePanel() {
         try {
 
           const response =
-            await axios.get<
-              Lineage[]
-            >(
+            await axios.get<LineageResponse>(
               "http://localhost:8000/api/lineage/"
             );
 
           setLineages(
-            response.data
+            response.data.top_lineages ?? []
           );
 
         } catch (error) {

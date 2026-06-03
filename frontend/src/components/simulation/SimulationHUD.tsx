@@ -1,16 +1,10 @@
+import { memo } from "react";
 import { useSimulationStore } from "../../store/simulationStore";
 
-export default function SimulationHUD() {
-
-  const state =
-    useSimulationStore(
-      (s) => s.state
-    );
-
-  const camera =
-    useSimulationStore(
-      (s) => s.camera
-    );
+function SimulationHUDComponent() {
+  // Use individual selectors to prevent infinite loops
+  const state = useSimulationStore((s) => s.state);
+  const camera = useSimulationStore((s) => s.camera);
 
   if (!state) {
     return null;
@@ -139,7 +133,7 @@ export default function SimulationHUD() {
     <div className="mt-2 flex flex-wrap gap-1">
 
       {dominant.traits.map(
-        (trait) => (
+        (trait: string) => (
           <span
             key={trait}
             className="
@@ -173,3 +167,5 @@ export default function SimulationHUD() {
     </div>
   );
 }
+
+export default memo(SimulationHUDComponent);

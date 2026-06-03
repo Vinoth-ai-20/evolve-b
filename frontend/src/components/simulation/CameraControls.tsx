@@ -1,55 +1,26 @@
+import { memo } from "react";
 import { useSimulationStore } from "../../store/simulationStore";
 
-export default function CameraControls() {
-  const zoom =
-    useSimulationStore(
-      (s) => s.camera.zoom
-    );
-
-  const zoomIn =
-    useSimulationStore(
-      (s) => s.zoomIn
-    );
-
-  const zoomOut =
-    useSimulationStore(
-      (s) => s.zoomOut
-    );
-
-  const setCameraPosition =
-    useSimulationStore(
-      (s) => s.setCameraPosition
-    );
-
-  const resetZoom =
-    useSimulationStore(
-      (s) => s.resetZoom
-    );
+function CameraControlsComponent() {
+  // Use individual selectors to prevent infinite loops
+  const zoom = useSimulationStore((s) => s.camera.zoom);
+  const zoomIn = useSimulationStore((s) => s.zoomIn);
+  const zoomOut = useSimulationStore((s) => s.zoomOut);
+  const setCameraPosition = useSimulationStore((s) => s.setCameraPosition);
+  const resetZoom = useSimulationStore((s) => s.resetZoom);
 
   const handleHome = () => {
     setCameraPosition(0, 0);
     resetZoom();
   };
 
-  const heatmapMode =
-    useSimulationStore(
-      (s) => s.heatmapMode
-    );
+  // Use individual selectors to prevent infinite loops
+  const heatmapMode = useSimulationStore((s) => s.heatmapMode);
+  const setHeatmapMode = useSimulationStore((s) => s.setHeatmapMode);
 
-  const setHeatmapMode =
-    useSimulationStore(
-      (s) => s.setHeatmapMode
-    );
-
-  const followSelected =
-    useSimulationStore(
-      (s) => s.followSelected
-    );
-
-  const toggleFollowSelected =
-    useSimulationStore(
-      (s) => s.toggleFollowSelected
-    );
+  // Use individual selectors to prevent infinite loops
+  const followSelected = useSimulationStore((s) => s.followSelected);
+  const toggleFollowSelected = useSimulationStore((s) => s.toggleFollowSelected);
 
   return (
     <div
@@ -60,7 +31,7 @@ export default function CameraControls() {
       z-20
       flex
       flex-col
-      gap-2
+      gap-1
       "
     >
       <button
@@ -68,8 +39,9 @@ export default function CameraControls() {
         className="
         rounded
         bg-slate-800
-        px-3
-        py-2
+        px-2
+        py-1
+        text-sm
         hover:bg-slate-700
         "
       >
@@ -81,8 +53,9 @@ export default function CameraControls() {
         className="
         rounded
         bg-slate-800
-        px-3
-        py-2
+        px-2
+        py-1
+        text-sm
         hover:bg-slate-700
         "
       >
@@ -95,8 +68,9 @@ export default function CameraControls() {
         }
         className={`
     rounded
-    px-3
-    py-2
+    px-2
+    py-1
+    text-sm
     ${followSelected
             ? "bg-cyan-600"
             : "bg-slate-800"
@@ -112,15 +86,16 @@ export default function CameraControls() {
         className="
         rounded
         bg-slate-800
-        px-3
-        py-2
+        px-2
+        py-1
+        text-sm
         hover:bg-slate-700
         "
       >
         Home
       </button>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1">
 
         <button
           onClick={() =>
@@ -130,8 +105,8 @@ export default function CameraControls() {
           }
           className={
             heatmapMode === "population"
-              ? "rounded bg-cyan-600 px-3 py-2"
-              : "rounded bg-slate-800 px-3 py-2"
+              ? "rounded bg-cyan-600 px-2 py-1 text-sm"
+              : "rounded bg-slate-800 px-2 py-1 text-sm"
           }
         >
           Population
@@ -145,8 +120,8 @@ export default function CameraControls() {
           }
           className={
             heatmapMode === "resources"
-              ? "rounded bg-cyan-600 px-3 py-2"
-              : "rounded bg-slate-800 px-3 py-2"
+              ? "rounded bg-cyan-600 px-2 py-1 text-sm"
+              : "rounded bg-slate-800 px-2 py-1 text-sm"
           }
         >
           Resources
@@ -160,8 +135,8 @@ export default function CameraControls() {
           }
           className={
             heatmapMode === "none"
-              ? "rounded bg-cyan-600 px-3 py-2"
-              : "rounded bg-slate-800 px-3 py-2"
+              ? "rounded bg-cyan-600 px-2 py-1 text-sm"
+              : "rounded bg-slate-800 px-2 py-1 text-sm"
           }
         >
           Off
@@ -173,8 +148,8 @@ export default function CameraControls() {
         className="
         rounded
         bg-slate-900
-        px-3
-        py-2
+        px-2
+        py-1
         text-center
         text-xs
         "
@@ -184,3 +159,5 @@ export default function CameraControls() {
     </div>
   );
 }
+
+export default memo(CameraControlsComponent);

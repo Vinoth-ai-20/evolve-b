@@ -44,3 +44,25 @@ export function worldToScreen(
       camera.viewportHeight / 2,
   };
 }
+
+export function screenToWorld(
+  screenX: number,
+  screenY: number,
+  camera: Camera,
+) {
+
+  return {
+
+    x:
+      (screenX -
+        camera.viewportWidth / 2) /
+      camera.zoom +
+      camera.x,
+
+    y:
+      (screenY -
+        camera.viewportHeight / 2) /
+      camera.zoom +
+      camera.y,
+  };
+}

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, memo } from "react";
 import { useSimulationStore } from "../../store/simulationStore";
 
 interface StatCardProps {
@@ -8,7 +8,7 @@ interface StatCardProps {
   subtitle?: string;
 }
 
-function StatCard({
+const StatCard = memo(function StatCard({
   label,
   value,
   color,
@@ -45,34 +45,17 @@ function StatCard({
       )}
     </div>
   );
-}
+});
 
-export default function StatsDashboard() {
-  const state =
-    useSimulationStore(
-      (s) => s.state
-    );
-
-  const population =
-    state?.population ?? 0;
-
-  const speed =
-    state?.simulation_speed ?? 1;
-
-  const temperature =
-    state?.environment.temperature ?? 0;
-
-  const humidity =
-    state?.environment.humidity ?? 0;
-
-  const sunlight =
-    state?.environment.sunlight ?? 0;
-
-  const trophic =
-    state?.trophic_levels;
-
-  const speciesCount =
-    state?.species_count ?? 0;
+function StatsDashboardComponent() {
+  // Use individual selectors to prevent infinite loops
+  const population = useSimulationStore((s) => s.state?.population ?? 0);
+  const speed = useSimulationStore((s) => s.state?.simulation_speed ?? 1);
+  const temperature = useSimulationStore((s) => s.state?.environment.temperature ?? 0);
+  const humidity = useSimulationStore((s) => s.state?.environment.humidity ?? 0);
+  const sunlight = useSimulationStore((s) => s.state?.environment.sunlight ?? 0);
+  const trophic = useSimulationStore((s) => s.state?.trophic_levels);
+  const speciesCount = useSimulationStore((s) => s.state?.species_count ?? 0);
 
   const healthScore =
     useMemo(() => {
@@ -209,3 +192,5 @@ export default function StatsDashboard() {
     </div>
   );
 }
+
+export default memo(StatsDashboardComponent);

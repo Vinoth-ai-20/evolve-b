@@ -39,6 +39,7 @@ from app.simulation.sensing import (
     sense_nearest_food,
 )
 from app.simulation.behavior import (
+    move_to_memory,
     move_toward_target,
     random_exploration,
 )
@@ -74,6 +75,21 @@ from app.simulation.behavior import (
     move_away_from_target,
 )
 
+from app.simulation.sensing import (
+    find_mate,
+)
+
+from app.environment.climate_events import (
+    climate_event_manager,
+)
+
+from app.ecology.disease import (
+    disease_manager,
+)
+
+from app.simulation.behavior import (
+    move_toward_home,
+)
 
 class SimulationEngine:
 
@@ -120,25 +136,14 @@ class SimulationEngine:
         while self.running:
 
             try:
-
-                print(f"RUN LOOP START tick={self.tick_count}")
-
                 self.tick()
-
-                print(f"TICK COMPLETE tick={self.tick_count}")
-
                 await broadcast_simulation_state(self)
 
-                print(f"BROADCAST COMPLETE tick={self.tick_count}")
-
             except Exception:
-
                 import traceback
 
                 traceback.print_exc()
-
                 raise
-
             await asyncio.sleep(base_tick_duration / self.simulation_speed)
 
     def tick(self):
@@ -151,6 +156,10 @@ class SimulationEngine:
 
         self.environment.regenerate_resources()
 
+        self.environment.resources.update_hotspots(
+            self.tick_count,
+        )
+
         capacity_multiplier = (
             0.5 + self.environment.humidity + self.environment.sunlight
         )
@@ -161,8 +170,9 @@ class SimulationEngine:
         )
 
         for organism in self.organisms:
-
             self.spatial_grid.insert(organism)
+
+        for organism in self.organisms:
 
             organism.visible_organisms = sense_nearby_organisms(
                 organism,
@@ -178,6 +188,16 @@ class SimulationEngine:
                 organism,
                 self.environment,
             )
+
+            if organism.visible_food:
+
+                if organism.visible_food.amount > organism.best_food_amount:
+
+                    organism.best_food_amount = organism.visible_food.amount
+
+                    organism.best_food_x = organism.visible_food.x
+
+                    organism.best_food_y = organism.visible_food.y
 
             if organism.genome.diet_type == 1:
 
@@ -201,9 +221,23 @@ class SimulationEngine:
 
                 else:
 
-                    random_exploration(
-                        organism,
-                    )
+                    if organism.energy < 40:
+
+                        move_to_memory(
+                            organism,
+                        )
+
+                    elif organism.territory_strength > 0.5:
+
+                        move_toward_home(
+                            organism,
+                        )
+
+                    else:
+
+                        random_exploration(
+                            organism,
+                        )
 
             elif organism.genome.diet_type == 0:
 
@@ -227,9 +261,23 @@ class SimulationEngine:
 
                 else:
 
-                    random_exploration(
-                        organism,
-                    )
+                    if organism.energy < 40:
+
+                        move_to_memory(
+                            organism,
+                        )
+
+                    elif organism.territory_strength > 0.5:
+
+                        move_toward_home(
+                            organism,
+                        )
+
+                    else:
+
+                        random_exploration(
+                            organism,
+                        )
 
             else:
 
@@ -243,11 +291,30 @@ class SimulationEngine:
 
                 else:
 
-                    random_exploration(
-                        organism,
-                    )
+                    if organism.energy < 40:
+
+                        move_to_memory(
+                            organism,
+                        )
+
+                    elif organism.territory_strength > 0.5:
+
+                        move_toward_home(
+                            organism,
+                        )
+
+                    else:
+
+                        random_exploration(
+                            organism,
+                        )
 
             organism.update()
+
+            disease_manager.spread(
+                organism,
+                self.tick_count,
+            )
 
             organism.fitness = calculate_fitness(organism)
 
@@ -287,9 +354,11 @@ class SimulationEngine:
                 self.tick_count,
             )
 
+            mate = find_mate(organism)
+
             child = attempt_reproduction(
                 organism,
-                self.environment,
+                mate,
                 self.tick_count,
             )
 
@@ -352,6 +421,25 @@ class SimulationEngine:
             self.organisms,
             self.tick_count,
         )
+
+        self.environment.update_season(self.tick_count)
+
+        climate_event_manager.update(
+            self.environment,
+            self.tick_count,
+        )
+
+        disease_manager.update(
+            self.organisms,
+            self.tick_count,
+        )
+
+        if self.tick_count % 2000 == 0:
+
+            disease_manager.seed_random_infections(
+                self.organisms,
+                self.tick_count,
+            )
 
     def pause(self):
 

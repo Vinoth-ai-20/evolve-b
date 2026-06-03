@@ -49,9 +49,9 @@ export default function SpeciesPanel() {
     >
       <h2
         className="
-        text-xl
+        text-lg
         font-bold
-        mb-4
+        mb-6
         "
       >
         Species

@@ -92,3 +92,44 @@ class Environment:
                 min(section, 3),
             )
         ]
+
+    def update_season(
+        self,
+        tick_count: int,
+    ):
+
+        season_cycle = 4000
+
+        phase = (tick_count % season_cycle) / season_cycle
+
+        import math
+
+        self.temperature = 0.5 + 0.3 * math.sin(phase * 2 * math.pi)
+
+        self.sunlight = 0.5 + 0.3 * math.sin(phase * 2 * math.pi)
+
+        self.humidity = 0.5 + 0.2 * math.cos(phase * 2 * math.pi)
+
+        self.temperature = max(
+            0.0,
+            min(
+                1.0,
+                self.temperature,
+            ),
+        )
+
+        self.sunlight = max(
+            0.0,
+            min(
+                1.0,
+                self.sunlight,
+            ),
+        )
+
+        self.humidity = max(
+            0.0,
+            min(
+                1.0,
+                self.humidity,
+            ),
+        )

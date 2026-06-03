@@ -28,4 +28,9 @@ def serialize_environment(
         "temperature": environment.temperature,
         "humidity": environment.humidity,
         "sunlight": environment.sunlight,
+        "season": getattr(
+            environment,
+            "season",
+            "Spring",
+        ),
     }
