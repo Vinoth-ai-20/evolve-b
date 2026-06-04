@@ -99,6 +99,8 @@ export default function PixiSimulationCanvas() {
       let cachedHoverOrganism: { x: number; y: number; radius?: number; id: string } | null = null;
       let lastHoverCheckFrame = -100;
       let frameCount = 0;
+      let fpsFrames = 0;
+      let fpsLastTime = performance.now();
       const HOVER_CHECK_FREQUENCY = 6; // Check every 6 frames (~10Hz instead of 60Hz)
 
       // Debounce camera input: collect changes and batch update
@@ -389,6 +391,24 @@ export default function PixiSimulationCanvas() {
 
       const tick = () => {
         frameCount++;
+
+        fpsFrames++;
+
+        const now = performance.now();
+
+        if (now - fpsLastTime >= 1000) {
+          useSimulationStore
+            .getState()
+            .setFps(
+              Math.round(
+                (fpsFrames * 1000) /
+                (now - fpsLastTime)
+              )
+            );
+
+          fpsFrames = 0;
+          fpsLastTime = now;
+        }
         const store =
           useSimulationStore.getState();
 

@@ -27,6 +27,10 @@ interface SimulationStore {
 
   tickInterval: number;
 
+  fps: number;
+
+  setFps: (fps: number) => void;
+
   toggleFollowSelected: () => void;
 
   setState: (state: SimulationState) => void;
@@ -88,6 +92,12 @@ export const useSimulationStore =
     followSelected: false,
     heatmapMode: "none",
     tickInterval: 50,
+    fps: 0,
+
+    setFps: (fps) =>
+      set({
+        fps,
+      }),
 
     setTickInterval: (ms) =>
       set({

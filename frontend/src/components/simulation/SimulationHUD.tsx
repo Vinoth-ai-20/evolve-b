@@ -3,8 +3,17 @@ import { useSimulationStore } from "../../store/simulationStore";
 
 function SimulationHUDComponent() {
   // Use individual selectors to prevent infinite loops
-  const state = useSimulationStore((s) => s.state);
-  const camera = useSimulationStore((s) => s.camera);
+  const state = useSimulationStore(
+    (s) => s.state
+  );
+
+  const camera = useSimulationStore(
+    (s) => s.camera
+  );
+
+  const fps = useSimulationStore(
+    (s) => s.fps
+  );
 
   if (!state) {
     return null;
@@ -80,6 +89,20 @@ function SimulationHUDComponent() {
         <div>
           {(camera.zoom * 100).toFixed(0)}%
         </div>
+        <div>FPS</div>
+        <div
+          className={
+            fps >= 55
+              ? "text-green-400"
+              : fps >= 30
+                ? "text-yellow-400"
+                : "text-red-400"
+          }
+        >
+          {fps}
+        </div>
+        <div>Organisms</div>
+        <div>{state.organisms.length}</div>
         <div>Camera X</div>
         <div>{camera.x.toFixed(0)}</div>
 

@@ -68,7 +68,7 @@ export default function Dashboard() {
     <main className="w-full px-6 py-6">
       <StatsDashboard />
 
-      <div className="mt-6 grid min-h-[700px] grid-cols-12 gap-6">
+      <div className="mt-6 grid min-h-[850px] grid-cols-12 gap-6">
 
         <section className="col-span-12 xl:col-span-9">
 

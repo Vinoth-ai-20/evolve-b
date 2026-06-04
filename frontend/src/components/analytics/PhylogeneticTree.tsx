@@ -198,7 +198,7 @@ export default function PhylogeneticTree() {
       ) : (
         <div
           className="
-          max-h-[700px]
+          max-h-212
           overflow-auto
           "
         >
