@@ -4,6 +4,18 @@ import { useSimulationStore } from "../../store/simulationStore";
 import { GraphicsPool } from "../../utils/GraphicsPool";
 import { calculateVisibleBounds, isVisible } from "../../utils/ViewportCulling";
 
+// Declare debug utilities on window
+declare global {
+  interface Window {
+    __lastSelectedId?: string | null;
+    __selectionDebug: {
+      getState: () => Record<string, unknown>;
+      clearSelection: () => void;
+      selectOrganism: (id: string) => void;
+    };
+  }
+}
+
 export default function PixiSimulationCanvas() {
   const containerRef = useRef<HTMLDivElement>(null);
   const graphicsMap = useRef<Map<string, Graphics>>(new Map());
@@ -38,22 +50,56 @@ export default function PixiSimulationCanvas() {
       container.innerHTML = '';
       container.appendChild(app.canvas);
 
+      // Force canvas to fill container
+      app.canvas.style.width = '100%';
+      app.canvas.style.height = '100%';
+      app.canvas.style.display = 'block';
+
+      // Add ResizeObserver to handle container resizing
+      const resizeObserver = new ResizeObserver(() => {
+        if (app && container) {
+          app.resize();
+        }
+      });
+      resizeObserver.observe(container);
+
       if (destroyed) {
         app.destroy();
         pool.destroy();
+        resizeObserver.disconnect();
         return;
       }
 
       const world = new Container();
       app.stage.addChild(world);
 
-      // Create heatmap layer
+      // Create containers for proper layering
+      // Order matters: organisms rendered first, then overlays on top
+      const organismsContainer = new Container();
+      world.addChild(organismsContainer);
+
       const heatmapGraphics = new Graphics();
       world.addChild(heatmapGraphics);
+
+      // Create hover ring layer (visual feedback for mouse-over)
+      const hoverRing = new Graphics();
+      world.addChild(hoverRing);
+
+      // Create selection ring layer (ALWAYS ON TOP)
+      const selectionRing = new Graphics();
+      world.addChild(selectionRing);
 
       let dragging = false;
       let lastX = 0;
       let lastY = 0;
+      let lastMouseWorldX = 0;
+      let lastMouseWorldY = 0;
+
+      // Cache hover detection to avoid checking every frame
+      let cachedHoverOrganism: { x: number; y: number; radius?: number; id: string } | null = null;
+      let lastHoverCheckFrame = -100;
+      let frameCount = 0;
+      const HOVER_CHECK_FREQUENCY = 6; // Check every 6 frames (~10Hz instead of 60Hz)
 
       // Debounce camera input: collect changes and batch update
       let pendingCameraX = 0;
@@ -118,12 +164,22 @@ export default function PixiSimulationCanvas() {
       const handleMouseMove = (
         event: MouseEvent,
       ) => {
+        const store =
+          useSimulationStore.getState();
+
+        const rect = app.canvas.getBoundingClientRect();
+        const canvasX = event.clientX - rect.left;
+        const canvasY = event.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        // Track world position for hover detection
+        lastMouseWorldX = store.camera.x + (canvasX - centerX) / store.camera.zoom;
+        lastMouseWorldY = store.camera.y + (canvasY - centerY) / store.camera.zoom;
+
         if (!dragging) {
           return;
         }
-
-        const store =
-          useSimulationStore.getState();
 
         const dx =
           event.clientX - lastX;
@@ -156,6 +212,131 @@ export default function PixiSimulationCanvas() {
         }
       };
 
+      // Get organism at current mouse position (for hover effect)
+      const getOrganismAtMouse = () => {
+        const store = useSimulationStore.getState();
+        const state = store.state;
+        if (!state) return null;
+
+        const screenClickTolerance = 15;
+        const hoverTolerance = screenClickTolerance / store.camera.zoom;
+
+        let closestOrganism = null;
+        let closestDistance = Infinity;
+
+        for (const organism of state.organisms) {
+          const radius = organism.radius ?? 20;
+          const distance = Math.sqrt(
+            (lastMouseWorldX - organism.x) ** 2 +
+            (lastMouseWorldY - organism.y) ** 2
+          );
+
+          if (distance <= radius + hoverTolerance && distance < closestDistance) {
+            closestOrganism = organism;
+            closestDistance = distance;
+          }
+        }
+
+        return closestOrganism;
+      };
+
+      // Hit testing and organism selection
+      const getOrganismAtPoint = (canvasX: number, canvasY: number) => {
+        const store = useSimulationStore.getState();
+        const state = store.state;
+        if (!state) {
+          console.log('[Selection] No state available for hit test');
+          return null;
+        }
+
+        const centerX = app.canvas.width / 2;
+        const centerY = app.canvas.height / 2;
+
+        // Convert screen coordinates to world coordinates
+        const worldX = store.camera.x + (canvasX - centerX) / store.camera.zoom;
+        const worldY = store.camera.y + (canvasY - centerY) / store.camera.zoom;
+
+        // CRITICAL FIX: Click tolerance should scale with zoom
+        // Convert screen-space tolerance to world-space based on current zoom level
+        const screenClickTolerance = 15; // pixels on screen
+        const clickTolerance = screenClickTolerance / store.camera.zoom; // pixels in world space
+
+        console.log('[Selection] Hit test:', {
+          canvasClick: { x: canvasX, y: canvasY },
+          worldPos: { x: worldX.toFixed(1), y: worldY.toFixed(1) },
+          camera: { x: store.camera.x.toFixed(1), y: store.camera.y.toFixed(1), zoom: store.camera.zoom.toFixed(2) },
+          tolerance: clickTolerance.toFixed(1),
+          organisms: state.organisms.length,
+        });
+
+        let closestOrganism = null;
+        let closestDistance = Infinity;
+
+        for (const organism of state.organisms) {
+          const radius = organism.radius ?? 20;
+          const distance = Math.sqrt(
+            (worldX - organism.x) ** 2 +
+            (worldY - organism.y) ** 2
+          );
+
+          // Hit if within organism radius + tolerance
+          if (distance <= radius + clickTolerance) {
+            console.log('[Selection] Hit organism:', organism.id.slice(0, 8) + '...', {
+              distance: distance.toFixed(1),
+              radius: radius.toFixed(1),
+              hitRadius: (radius + clickTolerance).toFixed(1),
+            });
+          }
+
+          if (distance <= radius + clickTolerance && distance < closestDistance) {
+            closestOrganism = organism;
+            closestDistance = distance;
+          }
+        }
+
+        console.log('[Selection] Hit result: closest organism:', closestOrganism?.id.slice(0, 8) + '...' || 'none', 'distance:', closestDistance.toFixed(1));
+        return closestOrganism;
+      };
+
+      const handleCanvasClick = (event: MouseEvent) => {
+        console.log('[Selection] ===== CLICK EVENT =====');
+
+        if (dragging) {
+          console.log('[Selection] Click ignored: currently dragging');
+          return;
+        }
+
+        const rect = app.canvas.getBoundingClientRect();
+        const canvasX = event.clientX - rect.left;
+        const canvasY = event.clientY - rect.top;
+
+        console.log('[Selection] Canvas click position:', {
+          x: canvasX.toFixed(1),
+          y: canvasY.toFixed(1),
+          canvasSize: { width: rect.width, height: rect.height },
+          eventTarget: (event.target as HTMLCanvasElement | null)?.constructor?.name || 'unknown',
+        });
+
+        const organism = getOrganismAtPoint(canvasX, canvasY);
+        const store = useSimulationStore.getState();
+
+        if (organism) {
+          console.log('[Selection] ✓ Selected organism:', organism.id.slice(0, 8) + '...', 'at', { x: organism.x.toFixed(1), y: organism.y.toFixed(1) });
+          store.setSelectedOrganism(organism.id);
+          console.log('[Selection] Store state after selection:', { selectedId: store.selectedOrganismId });
+        } else {
+          console.log('[Selection] ✓ Click on empty space: clearing selection');
+          store.setSelectedOrganism(null);
+          console.log('[Selection] Store state after clear:', { selectedId: store.selectedOrganismId });
+        }
+        console.log('[Selection] ===== END CLICK =====');
+      };
+
+      app.canvas.addEventListener(
+        "click",
+        handleCanvasClick,
+      );
+
       app.canvas.addEventListener(
         "wheel",
         handleWheel,
@@ -176,6 +357,30 @@ export default function PixiSimulationCanvas() {
         handleMouseMove,
       );
 
+      // Also add pointer-events-auto to canvas to ensure it receives clicks
+      app.canvas.style.pointerEvents = 'auto';
+
+      // Debug utilities exposed on window
+      window.__selectionDebug = {
+        getState: () => {
+          const store = useSimulationStore.getState();
+          return {
+            selectedId: store.selectedOrganismId,
+            followSelected: store.followSelected,
+            organisms: store.state?.organisms.length || 0,
+            camera: store.camera,
+          };
+        },
+        clearSelection: () => {
+          useSimulationStore.getState().setSelectedOrganism(null);
+          console.log('[Debug] Selection cleared');
+        },
+        selectOrganism: (id: string) => {
+          useSimulationStore.getState().setSelectedOrganism(id);
+          console.log('[Debug] Selected organism:', id);
+        },
+      };
+
       let firstFrameLogged = false;
       let viewportInitialized = false;
 
@@ -183,6 +388,7 @@ export default function PixiSimulationCanvas() {
       const CULLING_THRESHOLD = 500;
 
       const tick = () => {
+        frameCount++;
         const store =
           useSimulationStore.getState();
 
@@ -197,10 +403,10 @@ export default function PixiSimulationCanvas() {
         );
 
         world.position.set(
-          -store.camera.x *
-          store.camera.zoom,
-          -store.camera.y *
-          store.camera.zoom,
+          app.canvas.width / 2 -
+          store.camera.x * store.camera.zoom,
+          app.canvas.height / 2 -
+          store.camera.y * store.camera.zoom,
         );
 
         const activeIds =
@@ -261,7 +467,7 @@ export default function PixiSimulationCanvas() {
               // Hide but keep in map for state tracking
               const graphic = graphics.get(organism.id);
               if (graphic && graphic.parent) {
-                world.removeChild(graphic);
+                organismsContainer.removeChild(graphic);
                 pool.release(graphic);
                 graphics.delete(organism.id);
               }
@@ -292,7 +498,7 @@ export default function PixiSimulationCanvas() {
               .circle(0, 0, radius)
               .fill(color);
 
-            world.addChild(newGraphic);
+            organismsContainer.addChild(newGraphic);
 
             graphics.set(
               organism.id,
@@ -315,7 +521,7 @@ export default function PixiSimulationCanvas() {
           if (
             !activeIds.has(id)
           ) {
-            world.removeChild(
+            organismsContainer.removeChild(
               graphic,
             );
 
@@ -378,6 +584,68 @@ export default function PixiSimulationCanvas() {
             }
           }
         }
+
+        // Render hover ring for mouse-over feedback (skip frames to reduce lag)
+        // Only update hover detection every N frames
+        if (frameCount - lastHoverCheckFrame >= HOVER_CHECK_FREQUENCY) {
+          cachedHoverOrganism = getOrganismAtMouse();
+          lastHoverCheckFrame = frameCount;
+        }
+
+        hoverRing.clear();
+        if (cachedHoverOrganism && cachedHoverOrganism.id !== store.selectedOrganismId) {
+          // Show hover ring for organisms under cursor (but not selected)
+          const radius = cachedHoverOrganism.radius ?? 20;
+          hoverRing
+            .circle(cachedHoverOrganism.x, cachedHoverOrganism.y, radius + 2)
+            .stroke({ color: 0xffaa00, width: 1, alpha: 0.6 });
+        }
+
+        // Render selection ring and handle follow mode
+        selectionRing.clear();
+
+        if (store.selectedOrganismId) {
+          const selectedOrg = state.organisms.find(
+            (o) => o.id === store.selectedOrganismId
+          );
+
+          if (selectedOrg) {
+            const radius = selectedOrg.radius ?? 20;
+
+            // Draw triple selection ring for high visibility
+            // Outer glow ring
+            selectionRing
+              .circle(selectedOrg.x, selectedOrg.y, radius + 8)
+              .stroke({ color: 0x00ff00, width: 3, alpha: 0.3 });
+
+            // Middle ring (main indicator)
+            selectionRing
+              .circle(selectedOrg.x, selectedOrg.y, radius + 5)
+              .stroke({ color: 0x00ff00, width: 2, alpha: 0.8 });
+
+            // Inner bright ring (sharp focus)
+            selectionRing
+              .circle(selectedOrg.x, selectedOrg.y, radius + 2)
+              .stroke({ color: 0x00ff00, width: 2, alpha: 1.0 });
+
+            // Log rendering for debugging
+            if (!window.__lastSelectedId || window.__lastSelectedId !== store.selectedOrganismId) {
+              console.log('[Selection] Rendering selection ring for:', store.selectedOrganismId.slice(0, 8) + '...', 'at', { x: selectedOrg.x.toFixed(1), y: selectedOrg.y.toFixed(1), radius: radius.toFixed(1) });
+              window.__lastSelectedId = store.selectedOrganismId;
+            }
+
+            // Apply camera follow if enabled
+            if (store.followSelected) {
+              store.setCameraPosition(selectedOrg.x, selectedOrg.y);
+            }
+          } else {
+            // Selected organism not found in state (may have died)
+            console.log('[Selection] ⚠ Selected organism not found in state:', store.selectedOrganismId);
+          }
+        } else if (window.__lastSelectedId) {
+          console.log('[Selection] Selection cleared');
+          window.__lastSelectedId = null;
+        }
       };
 
       app.ticker.add(tick);
@@ -385,9 +653,16 @@ export default function PixiSimulationCanvas() {
       return () => {
         app.ticker.remove(tick);
 
+        resizeObserver.disconnect();
+
         app.canvas.removeEventListener(
           "wheel",
           handleWheel,
+        );
+
+        app.canvas.removeEventListener(
+          "click",
+          handleCanvasClick,
         );
 
         app.canvas.removeEventListener(
@@ -455,6 +730,7 @@ export default function PixiSimulationCanvas() {
         border
         border-slate-800
         overflow-hidden
+        relative
       "
     />
   );

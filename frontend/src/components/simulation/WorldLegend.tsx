@@ -14,6 +14,7 @@ export default function WorldLegend() {
       p-3
       text-xs
       backdrop-blur
+      pointer-events-none
       "
     >
       <div className="mb-2 font-semibold">

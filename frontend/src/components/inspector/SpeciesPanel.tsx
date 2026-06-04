@@ -52,6 +52,7 @@ export default function SpeciesPanel() {
         text-lg
         font-bold
         mb-6
+        mr-6
         "
       >
         Species

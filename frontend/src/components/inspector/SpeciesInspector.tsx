@@ -1,4 +1,5 @@
 import { useSimulationStore } from "../../store/simulationStore";
+import { useEffect } from "react";
 
 export default function SpeciesInspector() {
   const simulationState =
@@ -11,12 +12,21 @@ export default function SpeciesInspector() {
       (s) => s.selectedOrganismId
     );
 
+  // Log selection changes for debugging
+  useEffect(() => {
+    if (selectedOrganismId) {
+      console.log('[SpeciesInspector] ✓ Displaying organism:', selectedOrganismId.slice(0, 8) + '...');
+    } else {
+      console.log('[SpeciesInspector] Displaying default organism (no selection)');
+    }
+  }, [selectedOrganismId]);
+
   if (
     !simulationState ||
     simulationState.organisms.length === 0
   ) {
     return (
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 backdrop-blur shadow-lg">
+      <div className="h-full min-h-[700px] rounded-2xl border border-slate-800 bg-slate-900/80 backdrop-blur shadow-lg">
         <div className="border-b border-slate-800 px-5 py-4">
           <h3 className="text-lg font-semibold">
             Organism Inspector
@@ -40,14 +50,14 @@ export default function SpeciesInspector() {
     simulationState.organisms[0];
 
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/80 backdrop-blur shadow-lg">
+    <div className="h-full min-h-[700px] rounded-2xl border border-slate-800 bg-slate-900/80 backdrop-blur shadow-lg">
       <div className="border-b border-slate-800 px-5 py-4">
         <h3 className="text-lg font-semibold">
           Organism Inspector
         </h3>
       </div>
 
-      <div className="p-5 space-y-5">
+      <div className="h-[calc(100%-72px)] overflow-y-auto p-5 space-y-5">
 
         <div
           className="
@@ -188,11 +198,10 @@ export default function SpeciesInspector() {
               </div>
 
               <div
-                className={`mt-1 text-sm font-medium ${
-                  organism.alive
-                    ? "text-green-400"
-                    : "text-red-400"
-                }`}
+                className={`mt-1 text-sm font-medium ${organism.alive
+                  ? "text-green-400"
+                  : "text-red-400"
+                  }`}
               >
                 {organism.alive
                   ? "Alive"

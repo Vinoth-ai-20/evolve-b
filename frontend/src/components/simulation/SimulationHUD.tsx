@@ -52,6 +52,7 @@ function SimulationHUDComponent() {
     p-4
     text-xs
     backdrop-blur
+    pointer-events-none
     "
     >
 
@@ -79,80 +80,85 @@ function SimulationHUDComponent() {
         <div>
           {(camera.zoom * 100).toFixed(0)}%
         </div>
+        <div>Camera X</div>
+        <div>{camera.x.toFixed(0)}</div>
+
+        <div>Camera Y</div>
+        <div>{camera.y.toFixed(0)}</div>
 
       </div>
 
       {dominant && (
 
-  <div className="mt-4">
+        <div className="mt-4">
 
-    <div className="mb-2 font-semibold text-yellow-400">
-      Dominant Species
-    </div>
+          <div className="mb-2 font-semibold text-yellow-400">
+            Dominant Species
+          </div>
 
-    <div className="space-y-1">
+          <div className="space-y-1">
 
-      <div>
-        Population:
-        {" "}
-        {dominant.population}
-      </div>
+            <div>
+              Population:
+              {" "}
+              {dominant.population}
+            </div>
 
-      <div>
-        Share:
-        {" "}
-        {dominant.share}%
-      </div>
+            <div>
+              Share:
+              {" "}
+              {dominant.share}%
+            </div>
 
-      <div>
-        Diet:
-        {" "}
-        {dominant.diet}
-      </div>
+            <div>
+              Diet:
+              {" "}
+              {dominant.diet}
+            </div>
 
-      <div>
-        Generation:
-        {" "}
-        {dominant.max_generation}
-      </div>
+            <div>
+              Generation:
+              {" "}
+              {dominant.max_generation}
+            </div>
 
-      <div>
-        Avg Energy:
-        {" "}
-        {dominant.average_energy}
-      </div>
+            <div>
+              Avg Energy:
+              {" "}
+              {dominant.average_energy}
+            </div>
 
-      <div>
-        Avg Age:
-        {" "}
-        {dominant.average_age}
-      </div>
+            <div>
+              Avg Age:
+              {" "}
+              {dominant.average_age}
+            </div>
 
-    </div>
+          </div>
 
-    <div className="mt-2 flex flex-wrap gap-1">
+          <div className="mt-2 flex flex-wrap gap-1">
 
-      {dominant.traits.map(
-        (trait: string) => (
-          <span
-            key={trait}
-            className="
+            {dominant.traits.map(
+              (trait: string) => (
+                <span
+                  key={trait}
+                  className="
             rounded
             bg-slate-800
             px-2
             py-1
             "
-          >
-            {trait}
-          </span>
-        )
+                >
+                  {trait}
+                </span>
+              )
+            )}
+
+          </div>
+
+        </div>
+
       )}
-
-    </div>
-
-  </div>
-
-)}
 
       <div
         className="

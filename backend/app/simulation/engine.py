@@ -91,6 +91,7 @@ from app.simulation.behavior import (
     move_toward_home,
 )
 
+
 class SimulationEngine:
 
     def __init__(self):
@@ -179,10 +180,7 @@ class SimulationEngine:
                 self.spatial_grid,
             )
 
-            organism.local_density = sense_population_density(
-                organism,
-                self.spatial_grid,
-            )
+            organism.local_density = len(organism.visible_organisms)
 
             organism.visible_food = sense_nearest_food(
                 organism,

@@ -68,7 +68,7 @@ export default function Dashboard() {
     <main className="w-full px-6 py-6">
       <StatsDashboard />
 
-      <div className="mt-6 grid grid-cols-12 gap-6">
+      <div className="mt-6 grid min-h-[700px] grid-cols-12 gap-6">
 
         <section className="col-span-12 xl:col-span-9">
 
@@ -87,17 +87,15 @@ export default function Dashboard() {
 
         </section>
 
-        <aside className="col-span-12 xl:col-span-3 flex flex-col h-full">
-          <div className="flex-1">
-            <SpeciesPanel />
-          </div>
+        <aside className="col-span-12 xl:col-span-3">
+          <SpeciesInspector />
         </aside>
 
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
 
-        <SpeciesInspector />
+        <SpeciesPanel />
 
         <SimulationControls />
 

@@ -9,8 +9,16 @@ function CameraControlsComponent() {
   const setCameraPosition = useSimulationStore((s) => s.setCameraPosition);
   const resetZoom = useSimulationStore((s) => s.resetZoom);
 
+  const state = useSimulationStore.getState().state;
+
   const handleHome = () => {
-    setCameraPosition(0, 0);
+    if (!state) return;
+
+    setCameraPosition(
+      state.world_width / 2,
+      state.world_height / 2
+    );
+
     resetZoom();
   };
 
@@ -32,6 +40,7 @@ function CameraControlsComponent() {
       flex
       flex-col
       gap-1
+      pointer-events-auto
       "
     >
       <button
