@@ -91,6 +91,10 @@ from app.simulation.behavior import (
     move_toward_home,
 )
 
+from app.analytics.performance_profiler import (
+    ProfileBlock,
+    profiler,
+)
 
 class SimulationEngine:
 
@@ -155,7 +159,8 @@ class SimulationEngine:
 
         offspring = []
 
-        self.environment.regenerate_resources()
+        with ProfileBlock("resource_regeneration"):
+            self.environment.regenerate_resources()
 
         self.environment.resources.update_hotspots(
             self.tick_count,
@@ -170,198 +175,211 @@ class SimulationEngine:
             capacity_multiplier,
         )
 
-        for organism in self.organisms:
-            self.spatial_grid.insert(organism)
+        with ProfileBlock("spatial_grid"):
+            for organism in self.organisms:
+                self.spatial_grid.insert(organism)
 
-        for organism in self.organisms:
+        with ProfileBlock("organism_update"):
+            for organism in self.organisms:
 
-            organism.visible_organisms = sense_nearby_organisms(
-                organism,
-                self.spatial_grid,
-            )
-
-            organism.local_density = len(organism.visible_organisms)
-
-            organism.visible_food = sense_nearest_food(
-                organism,
-                self.environment,
-            )
-
-            if organism.visible_food:
-
-                if organism.visible_food.amount > organism.best_food_amount:
-
-                    organism.best_food_amount = organism.visible_food.amount
-
-                    organism.best_food_x = organism.visible_food.x
-
-                    organism.best_food_y = organism.visible_food.y
-
-            if organism.genome.diet_type == 1:
-
-                prey = nearest_prey(organism)
-
-                if prey:
-
-                    move_toward_target(
-                        organism,
-                        prey.x,
-                        prey.y,
-                    )
-
-                elif organism.visible_food:
-
-                    move_toward_target(
-                        organism,
-                        organism.visible_food.x,
-                        organism.visible_food.y,
-                    )
-
-                else:
-
-                    if organism.energy < 40:
-
-                        move_to_memory(
+                with ProfileBlock("sensing"):
+                    if self.tick_count % 5 == 0:
+                        organism.visible_organisms = sense_nearby_organisms(
                             organism,
+                            self.spatial_grid,
                         )
 
-                    elif organism.territory_strength > 0.5:
+                        organism.local_density = len(organism.visible_organisms)
 
-                        move_toward_home(
-                            organism,
-                        )
+                    organism.visible_food = sense_nearest_food(
+                        organism,
+                        self.environment,
+                        self.tick_count,
+                    )
+
+                    if organism.visible_food:
+
+                        if organism.visible_food.amount > organism.best_food_amount:
+
+                            organism.best_food_amount = organism.visible_food.amount
+
+                            organism.best_food_x = organism.visible_food.x
+
+                            organism.best_food_y = organism.visible_food.y
+
+                with ProfileBlock("behavior"):
+
+                    if organism.genome.diet_type == 1:
+
+                        prey = nearest_prey(organism)
+
+                        if prey:
+
+                            move_toward_target(
+                                organism,
+                                prey.x,
+                                prey.y,
+                            )
+
+                        elif organism.visible_food:
+
+                            move_toward_target(
+                                organism,
+                                organism.visible_food.x,
+                                organism.visible_food.y,
+                            )
+
+                        else:
+
+                            if organism.energy < 40:
+
+                                move_to_memory(
+                                    organism,
+                                )
+
+                            elif organism.territory_strength > 0.5:
+
+                                move_toward_home(
+                                    organism,
+                                )
+
+                            else:
+
+                                random_exploration(
+                                    organism,
+                                )
+
+                    elif organism.genome.diet_type == 0:
+
+                        predator = nearest_predator(organism)
+
+                        if predator:
+
+                            move_away_from_target(
+                                organism,
+                                predator.x,
+                                predator.y,
+                            )
+
+                        elif organism.visible_food:
+
+                            move_toward_target(
+                                organism,
+                                organism.visible_food.x,
+                                organism.visible_food.y,
+                            )
+
+                        else:
+
+                            if organism.energy < 40:
+
+                                move_to_memory(
+                                    organism,
+                                )
+
+                            elif organism.territory_strength > 0.5:
+
+                                move_toward_home(
+                                    organism,
+                                )
+
+                            else:
+
+                                random_exploration(
+                                    organism,
+                                )
 
                     else:
 
-                        random_exploration(
-                            organism,
-                        )
+                        if organism.visible_food:
 
-            elif organism.genome.diet_type == 0:
+                            move_toward_target(
+                                organism,
+                                organism.visible_food.x,
+                                organism.visible_food.y,
+                            )
 
-                predator = nearest_predator(organism)
+                        else:
 
-                if predator:
+                            if organism.energy < 40:
 
-                    move_away_from_target(
-                        organism,
-                        predator.x,
-                        predator.y,
+                                move_to_memory(
+                                    organism,
+                                )
+
+                            elif organism.territory_strength > 0.5:
+
+                                move_toward_home(
+                                    organism,
+                                )
+
+                            else:
+
+                                random_exploration(
+                                    organism,
+                                )
+
+                with ProfileBlock("organism_physics"):
+                    organism.update()
+
+                disease_manager.spread(
+                    organism,
+                    self.tick_count,
+                )
+
+                with ProfileBlock("fitness"):
+                    organism.fitness = calculate_fitness(organism)
+
+                with ProfileBlock("resource_consumption"):
+                    food = self.environment.resources.consume_resource(
+                        organism.x,
+                        organism.y,
                     )
 
-                elif organism.visible_food:
+                # Diet specialization
+                if organism.genome.diet_type == 0:
+                    # Herbivore bonus
+                    food *= 1.30
 
-                    move_toward_target(
-                        organism,
-                        organism.visible_food.x,
-                        organism.visible_food.y,
+                elif organism.genome.diet_type == 2:
+                    # Omnivore penalty
+                    food *= 0.80
+
+                organism.energy += food * organism.genome.energy_efficiency
+
+                organism.food_consumed += food
+
+                with ProfileBlock("environment"):
+                    biome = self.environment.get_biome_at(
+                        organism.x,
+                        organism.y,
                     )
 
-                else:
-
-                    if organism.energy < 40:
-
-                        move_to_memory(
-                            organism,
-                        )
-
-                    elif organism.territory_strength > 0.5:
-
-                        move_toward_home(
-                            organism,
-                        )
-
-                    else:
-
-                        random_exploration(
-                            organism,
-                        )
-
-            else:
-
-                if organism.visible_food:
-
-                    move_toward_target(
-                        organism,
-                        organism.visible_food.x,
-                        organism.visible_food.y,
+                    organism.apply_environmental_pressure(
+                        biome,
+                        self.environment,
                     )
 
-                else:
+                organism.energy -= population_pressure * 0.05
 
-                    if organism.energy < 40:
+                with ProfileBlock("predation"):
+                    attempt_predation(
+                        organism,
+                        organism.visible_organisms,
+                        self.tick_count,
+                    )
 
-                        move_to_memory(
-                            organism,
-                        )
+                with ProfileBlock("reproduction"):
+                    mate = find_mate(organism)
 
-                    elif organism.territory_strength > 0.5:
+                    child = attempt_reproduction(
+                        organism,
+                        mate,
+                        self.tick_count,
+                    )
 
-                        move_toward_home(
-                            organism,
-                        )
-
-                    else:
-
-                        random_exploration(
-                            organism,
-                        )
-
-            organism.update()
-
-            disease_manager.spread(
-                organism,
-                self.tick_count,
-            )
-
-            organism.fitness = calculate_fitness(organism)
-
-            food = self.environment.resources.consume_resource(
-                organism.x,
-                organism.y,
-            )
-
-            # Diet specialization
-            if organism.genome.diet_type == 0:
-                # Herbivore bonus
-                food *= 1.30
-
-            elif organism.genome.diet_type == 2:
-                # Omnivore penalty
-                food *= 0.80
-
-            organism.energy += food * organism.genome.energy_efficiency
-
-            organism.food_consumed += food
-
-            biome = self.environment.get_biome_at(
-                organism.x,
-                organism.y,
-            )
-
-            organism.apply_environmental_pressure(
-                biome,
-                self.environment,
-            )
-
-            organism.energy -= population_pressure * 0.05
-
-            attempt_predation(
-                organism,
-                organism.visible_organisms,
-                self.tick_count,
-            )
-
-            mate = find_mate(organism)
-
-            child = attempt_reproduction(
-                organism,
-                mate,
-                self.tick_count,
-            )
-
-            if child:
-                offspring.append(child)
+                if child:
+                    offspring.append(child)
 
         MAX_POPULATION = 5000
 
@@ -375,6 +393,21 @@ class SimulationEngine:
         )
 
         self.organisms = [organism for organism in self.organisms if organism.alive]
+
+        if self.tick_count % 300 == 0:
+
+            print("\n=== PERFORMANCE ===")
+
+            for key, value in profiler.snapshot().items():
+
+                print(
+                    f"{key}: "
+                    f"avg={value['avg_ms']}ms "
+                    f"total={value['total_ms']}ms "
+                    f"calls={value['calls']}"
+                )
+
+            profiler.reset()
 
         if self.tick_count % 100 == 0:
 
@@ -415,10 +448,11 @@ class SimulationEngine:
             average_fitness,
         )
 
-        collect_metrics(
-            self.organisms,
-            self.tick_count,
-        )
+        with ProfileBlock("analytics"):
+            collect_metrics(
+                self.organisms,
+                self.tick_count,
+            )
 
         self.environment.update_season(self.tick_count)
 
@@ -427,10 +461,11 @@ class SimulationEngine:
             self.tick_count,
         )
 
-        disease_manager.update(
-            self.organisms,
-            self.tick_count,
-        )
+        with ProfileBlock("disease"):
+            disease_manager.update(
+                self.organisms,
+                self.tick_count,
+            )
 
         if self.tick_count % 2000 == 0:
 

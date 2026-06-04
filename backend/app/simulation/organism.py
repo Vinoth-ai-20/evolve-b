@@ -38,6 +38,11 @@ class Organism:
     best_food_y: float = 0.0
     best_food_amount: float = 0.0
 
+    food_cache_x: float = 0.0
+    food_cache_y: float = 0.0
+    food_cache_amount: float = 0.0
+    food_cache_tick: int = 0
+
     home_x: float = 0.0
     home_y: float = 0.0
     territory_strength: float = 0.0

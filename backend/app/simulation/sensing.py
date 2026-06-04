@@ -62,28 +62,37 @@ def sense_population_density(
 def sense_nearest_food(
     organism,
     environment,
-) -> Optional[SensedFood]:
+    tick_count,
+):
+    CACHE_INTERVAL = 50
+
+    if (
+        organism.food_cache_tick > 0
+        and tick_count - organism.food_cache_tick < CACHE_INTERVAL
+    ):
+        return SensedFood(
+            organism.food_cache_x,
+            organism.food_cache_y,
+            organism.food_cache_amount,
+        )
 
     search_radius = int(organism.genome.vision_range * 3)
 
     resource_grid = environment.resources.grid
 
     grid_x = int(organism.x / 20)
-
     grid_y = int(organism.y / 20)
 
     best_food = None
     best_amount = 0
 
     width = resource_grid.shape[0]
-
     height = resource_grid.shape[1]
 
     for dx in range(
         -search_radius,
         search_radius + 1,
     ):
-
         for dy in range(
             -search_radius,
             search_radius + 1,
@@ -106,6 +115,13 @@ def sense_nearest_food(
                     y=y * 20,
                     amount=amount,
                 )
+
+    if best_food:
+
+        organism.food_cache_x = best_food.x
+        organism.food_cache_y = best_food.y
+        organism.food_cache_amount = best_food.amount
+        organism.food_cache_tick = tick_count
 
     return best_food
 
