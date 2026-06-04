@@ -1,228 +1,309 @@
 # Evolve-B
 
-Realtime scientific evolutionary ecosystem simulation platform with live visualization and analytics.
+> A scientific artificial life laboratory for studying evolution, ecology, emergent intelligence, and adaptive behavior in realtime.
 
-## Features
+![Status](https://img.shields.io/badge/status-active-success)
+![Version](https://img.shields.io/badge/version-v0.2.0--alpha1-blue)
+![Frontend](https://img.shields.io/badge/frontend-React%2019-61dafb)
+![Backend](https://img.shields.io/badge/backend-FastAPI-009688)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-- **Realtime Ecosystem Simulation** - Watch evolution in action with 250+ organisms
-- **Genetics & Inheritance** - Full genetic system with mutation, recombination, and phenotype generation
-- **Environmental Pressure** - Temperature, humidity, and resource dynamics affect survival
-- **Natural Selection** - Organisms survive based on fitness (energy, age, reproduction)
-- **Species Tracking** - Dynamic species classification based on genetic traits
-- **WebSocket Streaming** - Live updates with automatic reconnection
-- **Analytics Dashboards** - Population, fitness, diversity, and trophic level charts
-- **Organism Inspector** - Inspect individual organism traits and genetics
-- **Export Functionality** - Export population data as CSV or JSON
+---
 
-## Architecture
+## Vision
 
-### Backend Stack
+Evolve-B is an experimental ecosystem simulation platform designed to explore:
 
-- **Framework**: FastAPI with async/await
-- **Biology**: Custom simulation engine with genetics, ecology, and evolution
-- **Real-time**: WebSocket streaming, event broadcasting
-- **Data**: In-memory deques for history tracking
+* Evolutionary dynamics
+* Artificial life
+* Ecology and population systems
+* Emergent behavior
+* Neural evolution
+* Multi-agent intelligence
+* Reinforcement learning environments
+* Computational biology education
 
-### Frontend Stack
+The long-term goal is to create a scientific sandbox where thousands of organisms evolve, compete, cooperate, learn, and adapt inside a living ecosystem.
 
-- **Framework**: React 19 with TypeScript
-- **State Management**: Zustand
-- **Styling**: Tailwind CSS v4
-- **Visualization**: Canvas 2D rendering + Recharts
-- **Real-time**: WebSocket client with auto-reconnection
+---
 
-## Quick Start
+## Current State (v0.2.0-alpha1)
+
+### Simulation Core
+
+* Real-time ecosystem simulation
+* Genetic inheritance and mutation
+* Species emergence
+* Predator-prey interactions
+* Disease propagation
+* Environmental pressure
+* Climate events
+* Resource competition
+* Carrying capacity control
+* Dynamic trophic structures
+
+### Visualization
+
+* PixiJS accelerated rendering
+* Infinite camera navigation
+* Organism selection and tracking
+* Heatmaps
+
+  * Population density
+  * Resource distribution
+* Live organism inspection
+* Evolution analytics dashboard
+
+### Evolution Systems
+
+* Genome recombination
+* Mutation engine
+* Fitness calculation
+* Natural selection
+* Lineage tracking
+* Species classification
+* Extinction tracking
+* Evolution milestones
+
+### Research Analytics
+
+* Population dynamics
+* Genetic diversity
+* Evolution score
+* Apex predator tracking
+* Species dominance analysis
+* Phylogenetic tree visualization
+* Ecosystem event timeline
+
+---
+
+## Performance
+
+Current optimization status:
+
+| Metric               | Value                         |
+| -------------------- | ----------------------------- |
+| Population           | 250-300 organisms             |
+| Simulation Tick Rate | 30 TPS                        |
+| Rendering            | 60 FPS                        |
+| Organism Update Time | ~55 ms                        |
+| Broadcast Time       | ~8 ms                         |
+| Backend Improvement  | 43x faster than initial build |
+
+Recent optimizations:
+
+* Spatial partitioning
+* Viewport culling
+* Graphics pooling
+* Reduced sensing complexity
+* Cached food search
+* Optimized density calculations
+* Performance profiling framework
+
+---
+
+## Technology Stack
 
 ### Backend
+
+* FastAPI
+* Python
+* NumPy
+* WebSockets
+* AsyncIO
+
+### Frontend
+
+* React 19
+* TypeScript
+* Zustand
+* PixiJS
+* Tailwind CSS
+
+### Future Technologies
+
+* PyTorch
+* CUDA
+* Multi-processing
+* Tauri
+* WebGPU
+* Reinforcement Learning Frameworks
+
+---
+
+## Project Architecture
+
+```text
+Frontend
+ ├─ Pixi Renderer
+ ├─ Analytics Dashboard
+ ├─ Inspector System
+ ├─ Camera System
+ └─ Realtime WebSocket Client
+
+Backend
+ ├─ Simulation Engine
+ ├─ Genetics Engine
+ ├─ Ecology Systems
+ ├─ Environment Systems
+ ├─ Analytics Pipeline
+ ├─ Performance Profiler
+ └─ State Broadcaster
+```
+
+---
+
+## Running Locally
+
+### Backend_
 
 ```bash
 cd backend
 
-# Create virtual environment
 python -m venv venv
-& .\venv\Scripts\Activate.ps1
+venv\Scripts\activate
 
-# Install dependencies
 pip install -r requirements.txt
 
-# Start server
-python -m uvicorn app.main:app --reload
-# Server runs on http://localhost:8000
+uvicorn app.main:app --reload
 ```
 
-### Frontend
+Server:
+
+```text
+http://localhost:8000
+```
+
+### Frontend_
 
 ```bash
 cd frontend
 
-# Install dependencies
 npm install
 
-# Start dev server
 npm run dev
-# App runs on http://localhost:5173
 ```
 
-## Key Components
+Application:
 
-### Simulation Engine
-
-- **Tick**: 30 Hz update rate
-- **Organisms**: 250+ individuals with full genetics
-- **Traits**: Size, speed, metabolism, lifespan, fertility, vision, camouflage
-- **Selection**: Natural selection through energy/age-based mortality
-
-### Genetics
-
-- **Genome**: 11 traits per organism
-- **Mutation**: 8% per trait with ±15% magnitude
-- **Inheritance**: Single-parent with mutation or two-parent recombination
-- **Diet**: Herbivore, Carnivore, Omnivore with environmental trade-offs
-
-### Environment
-
-- **Resources**: Renewable plant-like resources in grid cells
-- **Biomes**: Desert, Tundra, Rainforest, Volcanic with different temperatures
-- **Pressure**: Organisms stress if temperature tolerance doesn't match biome
-- **Regeneration**: Resource regeneration at 0.05x per tick
-
-### Analytics
-
-- **Population History**: Track population changes over 10,000 ticks
-- **Genetic Diversity**: Shannon entropy of genome variation
-- **Fitness Tracking**: Average organism fitness (25% age + 25% energy + 35% reproduction + 15% adaptation)
-- **Species Classification**: Dynamic grouping by similar traits
-
-## Configuration
-
-Edit `backend/app/core/config.py`:
-
-- `WORLD_WIDTH/HEIGHT`: 2000 units (500x500 grid cells)
-- `INITIAL_POPULATION`: 250 organisms
-- `SIMULATION_TICK_RATE`: 30 Hz
-- `RESOURCE_REGEN_RATE`: 0.05 per tick
-
-## API Endpoints
-
-### Simulation Control
-
-- `POST /api/simulation/start` - Start simulation
-- `POST /api/simulation/pause` - Pause simulation
-- `POST /api/simulation/resume` - Resume simulation
-- `POST /api/simulation/reset` - Reset to initial state
-- `GET /api/simulation/state` - Get current state
-- `POST /api/simulation/speed` - Set simulation speed (0.1x - 20x)
-
-### API Analytics
-
-- `GET /api/analytics/stats` - Population and diversity stats
-- `GET /api/analytics/history` - Population and diversity history
-- `GET /api/analytics/fitness` - Fitness history over time
-- `GET /api/analytics/traits` - Average traits in population
-
-### Species & Export
-
-- `GET /api/species/` - List current species
-- `GET /api/export/csv` - Download population as CSV
-- `GET /api/export/json` - Download simulation state as JSON
-
-### WebSocket
-
-- `WS /ws/stream` - Subscribe to realtime simulation state updates
-
-## Testing
-
-Run backend tests:
-
-```bash
-cd backend
-python -m pytest tests/ -v
+```text
+http://localhost:5173
 ```
 
-All tests pass (7/7):
+---
 
-- Diversity calculation
-- Genome creation
-- Mutation logic
-- Reproduction
-- Spatial grid
-- Species tracking
-- Trait analysis
+## Roadmap
 
-## Performance
+### v0.2.x
 
-- **Rendering**: 60 FPS canvas with 300 visible organisms
-- **Network**: ~30 updates/sec, 50-200 KB/sec per client
-- **Simulation**: 30 Hz, ~10ms per tick with 250 organisms
-- **Memory**: ~50 MB for simulation + 100 MB for history
+Performance & Simulation Quality
 
-## Scientific Accuracy
+* Motion interpolation
+* Smooth rendering
+* Tick scheduler improvements
+* Better heatmaps
+* Organism tracking improvements
+* Save / Load simulation
 
-The simulation implements realistic evolutionary dynamics:
+### v0.3
 
-1. **Genetic Variation**: Mutations introduce heritable changes
-2. **Natural Selection**: Fitness affects reproduction probability (0.05x fertility)
-3. **Environmental Pressure**: Temperature mismatch causes stress (−0.15 energy/tick)
-4. **Resource Competition**: Limited resources create carrying capacity pressure
-5. **Reproduction Cost**: Energy cost prevents infinite growth
-6. **Lifespan**: Age-based mortality prevents population imbalance
+Neural Organisms
 
-## Project Structure
+* Artificial neural networks
+* Synapses and neurons
+* Brain visualization panel
+* Realtime neuron firing display
+* Decision tracing
 
-```bash
-backend/
-  app/
-    analytics/      # Metrics collection and tracking
-    api/           # REST API routes and WebSocket
-    core/          # Configuration and logging
-    ecology/       # Predator-prey interactions
-    environment/   # Biome, climate, resources
-    evolution/     # Fitness and selection
-    genetics/      # Genome, mutation, inheritance
-    models/        # Simulation state models
-    schemas/       # Pydantic request/response schemas
-    services/      # WebSocket manager, serializers
-    simulation/    # Core simulation engine
-    storage/       # Persistence layer
-  tests/           # Pytest unit tests
+### v0.4
 
-frontend/
-  src/
-    api/          # HTTP clients
-    components/   # React components (ui, analytics, simulation)
-    hooks/        # Custom React hooks
-    pages/        # Page components
-    store/        # Zustand state management
-    types/        # TypeScript type definitions
-    websocket/    # WebSocket client
-```
+Biological Realism
 
-## Known Limitations & Future Work
+* Photosynthesis
+* Oxygen / CO₂ cycle
+* Fungi networks
+* Aerobic metabolism
+* Anaerobic metabolism
+* Food chains
+* Ecosystem succession
 
-- Simulation is CPU-bound; optimization via multi-threading possible
-- Canvas rendering optimized for ~300 organisms; higher populations need LOD
-- Species classification fragile; should use clustering algorithms
-- No predator-prey complex yet (infrastructure exists)
-- No genetic visualization (phylogenetic trees)
-- Export limited to CSV/JSON; database persistence not implemented
+### v0.5
 
-## Contributing
+Research Platform
 
-Areas for improvement:
+* Experiment management
+* Dataset export
+* Statistical reports
+* Reproducible simulations
+* Academic publication support
 
-1. Add genetic visualization UI
-2. Implement proper phylogenetic tree rendering
-3. Add machine learning to analyze evolution strategies
-4. Implement terrain and spatial heterogeneity
-5. Add advanced filtering and statistics UI
-6. Performance optimization for 1000+ organisms
+### v0.6
+
+High Performance Engine
+
+* Multi-threaded simulation
+* User-configurable CPU cores
+* Parallel sensing
+* Parallel reproduction
+* Parallel environment updates
+
+### v0.7
+
+GPU Acceleration
+
+* CUDA support
+* PyTorch integration
+* GPU-based neural evolution
+* Reinforcement learning training
+
+### v0.8
+
+Desktop Application
+
+Built using Tauri
+
+* Windows
+* Linux
+* macOS
+
+### v1.0
+
+Artificial Life Laboratory
+
+* Thousands of organisms
+* Neural evolution
+* Emergent intelligence
+* Research-grade ecosystem simulation
+* Educational visualization suite
+
+---
+
+## Research Goals
+
+Evolve-B is being designed as a platform for:
+
+* Evolutionary biology education
+* Artificial life experiments
+* Emergent behavior research
+* Multi-agent systems research
+* Evolutionary computation
+* Neural evolution studies
+* Reinforcement learning environments
+
+Future academic publications generated from this project will focus on ecosystem simulation, emergent behavior, and AI-driven evolutionary systems.
+
+---
 
 ## License
 
-MIT
+MIT License
 
-## Research Notice
+---
 
-Evolve-B is an open-source research and educational project exploring evolutionary dynamics, ecosystem simulation, and AI-assisted software development.
+## Author
 
-This repository may contain code generated or assisted by AI systems including ChatGPT and Claude. The project serves as an experimental platform for evaluating AI-assisted scientific software engineering workflows and ecosystem simulation techniques.
+Vinoth
+
+Computer Science Engineer
+
+Building a next-generation artificial life and evolution laboratory.
